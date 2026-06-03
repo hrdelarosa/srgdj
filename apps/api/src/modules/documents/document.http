@@ -1,0 +1,106 @@
+### Verifica el health de la api
+GET http://localhost:3000/api/v1/health
+
+### Obtiene todos los documentos
+GET http://localhost:3000/api/v1/documents
+
+### Obtiene solo el documento por el id
+GET http://localhost:3000/api/v1/documents/1
+
+### Esto es un error ya que esa id no existe 
+GET http://localhost:3000/api/v1/no-existe
+
+### Crea un nuevo documento 
+POST http://localhost:3000/api/v1/documents
+Content-Type: application/json
+
+{
+  "caseNumber": "EXP-001/2026"
+}
+
+
+
+### Registra un nuevo usuario 
+POST http://localhost:3000/api/auth/register
+Content-Type: application/json
+
+{
+  "nombres": "Super Usuario",
+  "apellidos": "Admin",
+  "correo": "admin@gmail.com",
+  "contraseña": "admin123",
+  "confirmarContraseña": "admin123"
+}
+
+# {
+#   "nombres": "Hozmel Roberto",
+#   "apellidos": "De la Rosa Rendón",
+#   "correo": "hozmel.robert@gmail.com",
+#   "contraseña": "123456",
+#   "confirmarContraseña": "123456"
+# }
+
+### Iniciar sesión 
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "correo": "admin@gmail.com",
+  "contraseña": "admin123"
+}
+
+# {
+#   "correo": "hozmel.robert@gmail.com",
+#   "contraseña": "123456"
+# }
+
+### Cerrar sesión
+POST http://localhost:3000/api/auth/logout
+
+### Obtener el perfil del usuario
+GET http://localhost:3000/api/auth/profile/4
+
+### Configuarar el perfil del usuario
+GET http://localhost:3000/api/auth/profile/settings/f3d94723-cd4d-11ef-8762-48b2a523c160
+
+### Verificar token
+GET http://localhost:3000/api/auth/verify-token
+# Cookie: token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjcxYzM4NDQ1LTZiYzMtYmIxNy0xMWMzLWFmYzJiOWMzOTFjMiIsInVzX2NvcnJlbyI6ImFkbWluQGdtYWlsLmNvbSIsImlhdCI6MTc0MjYzMzMzMywiZXhwIjoxNzQyNjc2NTMzfQ.rnNCBDxSNy2wXLGo8tKuIByVarK5IEYMI4PnCoDJD_w
+
+### Refrescar token
+POST http://localhost:3000/api/auth/refresh-token
+Cookie: token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxMjM0NTY3ODkwIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+
+### Verificar correo
+POST http://localhost:3000/api/auth/email-verification
+Content-Type: application/json
+
+{
+  "token": "112345"
+}
+
+### Reenviar el código para la verificación del correo
+POST http://localhost:3000/api/auth/resend-email-verification
+Content-Type: application/json
+
+{
+  "correo": ""
+}
+
+### Solicitar restablecimiento de contraseña
+POST http://localhost:3000/api/auth/request-password-reset
+Content-Type: application/json
+
+{
+  "correo": "hozmel@gmail.com"
+}
+
+### Restablecimiento de contraseña
+POST http://localhost:3000/api/auth/reset-password
+Content-Type: application/json
+
+{
+  "token": "235e7fe9-ac875c86-f28329db-ab4c2664",
+  "contraseña": "chiga2008",
+  "confirmarContraseña": "chiga2008"
+}

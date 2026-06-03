@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express'
 import { documentService } from './document.service.js'
+import { AppError } from '../../utils/errors/app-error.js'
 
 export const documentController = {
   async findAll(req: Request, res: Response) {
@@ -14,8 +15,10 @@ export const documentController = {
     const document = await documentService.findById(Number(req.params.id))
 
     if (!document) {
-      return res.status(404).json({
+      throw new AppError({
         message: 'Document not found',
+        statusCode: 404,
+        code: 'DOCUMENT_NOT_FOUND',
       })
     }
 
@@ -33,6 +36,14 @@ export const documentController = {
       Number(req.params.id),
       req.body,
     )
+
+    if (!document) {
+      throw new AppError({
+        message: 'Document not found',
+        statusCode: 404,
+        code: 'DOCUMENT_NOT_FOUND',
+      })
+    }
 
     return res.json(document)
   },

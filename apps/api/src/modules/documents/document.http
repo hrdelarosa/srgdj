@@ -1,6 +1,3 @@
-### Verifica el health de la api
-GET http://localhost:3000/api/v1/health
-
 ### Obtiene todos los documentos
 GET http://localhost:3000/api/v1/documents
 
@@ -15,92 +12,27 @@ POST http://localhost:3000/api/v1/documents
 Content-Type: application/json
 
 {
-  "caseNumber": "EXP-001/2026"
+  "officeNumber": "INM-AJ-005/2026",
+  "caseNumber": "EXP-004/2026",
+  "actor": "María González Pérez",
+  "defendant": "Dirección administrativa",
+  "officeDate": "2026-06-01T00:00:00.000Z",
+  "receivedDate": "2026-06-02T00:00:00.000Z",
+  "annexes": "Acta de recepción",
+  "observations": "Documento de prueba para integración",
+  "documentTypeId": "019e9bc2-a9cd-74e0-bcc6-89bd3dd7c001",
+  "currentStatusId": "019e9bc2-a9d0-72f2-a385-2c5d1dd3310f",
+  "physicalLocationId": "019e9bc2-a9d2-750d-8326-0a84def3807d"
 }
 
-
-
-### Registra un nuevo usuario 
-POST http://localhost:3000/api/auth/register
+### Actualiza un documento existente
+PATCH http://localhost:3000/api/v1/documents/019e9bc2-aa31-7579-8b80-e9ed2450ecb3
 Content-Type: application/json
 
 {
-  "nombres": "Super Usuario",
-  "apellidos": "Admin",
-  "correo": "admin@gmail.com",
-  "contraseña": "admin123",
-  "confirmarContraseña": "admin123"
+  "observations": "Observación actualizada desde PATCH",
+  "annexes": "Anexo actualizado"
 }
 
-# {
-#   "nombres": "Hozmel Roberto",
-#   "apellidos": "De la Rosa Rendón",
-#   "correo": "hozmel.robert@gmail.com",
-#   "contraseña": "123456",
-#   "confirmarContraseña": "123456"
-# }
-
-### Iniciar sesión 
-POST http://localhost:3000/api/auth/login
-Content-Type: application/json
-
-{
-  "correo": "admin@gmail.com",
-  "contraseña": "admin123"
-}
-
-# {
-#   "correo": "hozmel.robert@gmail.com",
-#   "contraseña": "123456"
-# }
-
-### Cerrar sesión
-POST http://localhost:3000/api/auth/logout
-
-### Obtener el perfil del usuario
-GET http://localhost:3000/api/auth/profile/4
-
-### Configuarar el perfil del usuario
-GET http://localhost:3000/api/auth/profile/settings/f3d94723-cd4d-11ef-8762-48b2a523c160
-
-### Verificar token
-GET http://localhost:3000/api/auth/verify-token
-# Cookie: token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjcxYzM4NDQ1LTZiYzMtYmIxNy0xMWMzLWFmYzJiOWMzOTFjMiIsInVzX2NvcnJlbyI6ImFkbWluQGdtYWlsLmNvbSIsImlhdCI6MTc0MjYzMzMzMywiZXhwIjoxNzQyNjc2NTMzfQ.rnNCBDxSNy2wXLGo8tKuIByVarK5IEYMI4PnCoDJD_w
-
-### Refrescar token
-POST http://localhost:3000/api/auth/refresh-token
-Cookie: token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxMjM0NTY3ODkwIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
-
-### Verificar correo
-POST http://localhost:3000/api/auth/email-verification
-Content-Type: application/json
-
-{
-  "token": "112345"
-}
-
-### Reenviar el código para la verificación del correo
-POST http://localhost:3000/api/auth/resend-email-verification
-Content-Type: application/json
-
-{
-  "correo": ""
-}
-
-### Solicitar restablecimiento de contraseña
-POST http://localhost:3000/api/auth/request-password-reset
-Content-Type: application/json
-
-{
-  "correo": "hozmel@gmail.com"
-}
-
-### Restablecimiento de contraseña
-POST http://localhost:3000/api/auth/reset-password
-Content-Type: application/json
-
-{
-  "token": "235e7fe9-ac875c86-f28329db-ab4c2664",
-  "contraseña": "chiga2008",
-  "confirmarContraseña": "chiga2008"
-}
+### Elimina un documento existente (soft delete cambia el estado a 'deletedAt' sin eliminar físicamente el registro)
+PATCH http://localhost:3000/api/v1/documents/delete/019e9bc2-aa31-7579-8b80-e9ed2450ecb3

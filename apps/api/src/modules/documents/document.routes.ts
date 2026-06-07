@@ -1,13 +1,17 @@
 import { Router } from 'express'
-import { documentController } from './document.controller.js'
+import { DocumentController } from './document.controller.js'
+import { DocumentModel } from './document.model.js'
 import { validateRequest } from '../../middlewares/validate-request.js'
 import {
   createDocumentSchema,
   documentIdParamsSchema,
   updateDocumentSchema,
-} from './document.schema.js'
+} from '@srgdj/shared'
 
 export const documentRoutes = Router()
+const documentController = new DocumentController({
+  documentModel: DocumentModel,
+})
 
 documentRoutes.get('/', documentController.findAll)
 documentRoutes.get(
@@ -28,8 +32,13 @@ documentRoutes.patch(
   }),
   documentController.update,
 )
+documentRoutes.patch(
+  '/delete/:id',
+  validateRequest({ params: documentIdParamsSchema }),
+  documentController.delete,
+)
 documentRoutes.delete(
-  '/:id',
+  '/remove/:id',
   validateRequest({ params: documentIdParamsSchema }),
   documentController.remove,
 )

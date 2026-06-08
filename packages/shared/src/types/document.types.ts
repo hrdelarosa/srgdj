@@ -45,6 +45,11 @@ export interface DocumentListItem {
     drawer: string | null
     reference: string | null
   } | null
+  createdBy: {
+    id: string
+    name: string
+    fullname: string
+  }
 }
 
 export interface PaginatedResponse<T> {

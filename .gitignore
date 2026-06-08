@@ -30,3 +30,8 @@ dist-ssr
 
 ## Ignore folder with sensitive data
 certificates
+
+## Ignore folder with skills
+.agents
+.claude
+.cursor

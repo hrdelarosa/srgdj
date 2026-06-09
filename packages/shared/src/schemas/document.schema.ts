@@ -51,6 +51,19 @@ export const documentIdParamsSchema = z.object({
   id: uuidSchema,
 })
 
+export const findAllDocumentsQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  pageSize: z.coerce.number().int().min(1).max(100).default(30),
+  query: z
+    .string()
+    .trim()
+    .optional()
+    .transform((value) => (value === '' ? undefined : value)),
+  statusId: uuidSchema.optional(),
+  documentTypeId: uuidSchema.optional(),
+})
+
 export type CreateDocumentInput = z.infer<typeof createDocumentSchema>
 export type UpdateDocumentInput = z.infer<typeof updateDocumentSchema>
 export type DocumentIdParams = z.infer<typeof documentIdParamsSchema>
+export type FindAllDocumentsQuery = z.infer<typeof findAllDocumentsQuerySchema>

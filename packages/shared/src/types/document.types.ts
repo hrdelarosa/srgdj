@@ -6,6 +6,8 @@ import {
 
 export interface FindAllDocumentsParams extends PaginationParams {
   query?: string
+  statusId?: string
+  documentTypeId?: string
 }
 
 export interface CreateDocumentModelInput extends CreateDocumentInput {
@@ -48,7 +50,7 @@ export interface DocumentListItem {
   createdBy: {
     id: string
     name: string
-    fullname: string
+    fullName: string
   }
 }
 
@@ -57,4 +59,5 @@ export interface PaginatedResponse<T> {
   page: number
   pageSize: number
   total: number
+  totalPages: number
 }

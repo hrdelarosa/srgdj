@@ -5,6 +5,7 @@ import { validateRequest } from '../../middlewares/validate-request.js'
 import {
   createDocumentSchema,
   documentIdParamsSchema,
+  findAllDocumentsQuerySchema,
   updateDocumentSchema,
 } from '@srgdj/shared'
 
@@ -13,7 +14,11 @@ const documentController = new DocumentController({
   documentModel: DocumentModel,
 })
 
-documentRoutes.get('/', documentController.findAll)
+documentRoutes.get(
+  '/',
+  validateRequest({ query: findAllDocumentsQuerySchema }),
+  documentController.findAll,
+)
 documentRoutes.get(
   '/:id',
   validateRequest({ params: documentIdParamsSchema }),

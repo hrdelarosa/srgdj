@@ -12,8 +12,20 @@ export class DocumentService {
     this.documentModel = documentModel
   }
 
-  findAll = async ({ page, pageSize, query }: FindAllDocumentsParams) => {
-    return this.documentModel.findAll({ page, pageSize, query })
+  findAll = async ({
+    page,
+    pageSize,
+    query,
+    statusId,
+    documentTypeId,
+  }: FindAllDocumentsParams) => {
+    return this.documentModel.findAll({
+      page,
+      pageSize,
+      query,
+      statusId,
+      documentTypeId,
+    })
   }
 
   findById = async ({ id }: { id: string }) => {

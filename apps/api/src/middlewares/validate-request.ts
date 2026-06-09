@@ -1,4 +1,4 @@
-import type { RequestHandler } from 'express'
+import type { Request, RequestHandler } from 'express'
 import type { ZodType } from 'zod'
 import { ZodError } from 'zod'
 
@@ -8,17 +8,45 @@ interface ValidateSchemaOptions {
   query?: ZodType<any>
 }
 
+function assignParsedRequestValue<
+  K extends keyof Pick<Request, 'body' | 'params' | 'query'>,
+>(req: Request, key: K, value: Request[K]) {
+  Object.defineProperty(req, key, {
+    value,
+    writable: true,
+    configurable: true,
+    enumerable: true,
+  })
+}
+
 export function validateRequest(
   schemas: ValidateSchemaOptions,
 ): RequestHandler {
   return async (req, res, next) => {
     try {
-      if (schemas.body) req.body = await schemas.body.parseAsync(req.body)
+      if (schemas.body) {
+        assignParsedRequestValue(
+          req,
+          'body',
+          await schemas.body.parseAsync(req.body),
+        )
+      }
 
-      if (schemas.params)
-        req.params = await schemas.params.parseAsync(req.params)
+      if (schemas.params) {
+        assignParsedRequestValue(
+          req,
+          'params',
+          await schemas.params.parseAsync(req.params),
+        )
+      }
 
-      if (schemas.query) req.query = await schemas.query.parseAsync(req.query)
+      if (schemas.query) {
+        assignParsedRequestValue(
+          req,
+          'query',
+          await schemas.query.parseAsync(req.query),
+        )
+      }
 
       next()
     } catch (error) {

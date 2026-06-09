@@ -2,7 +2,10 @@ import type { Request, Response } from 'express'
 import { DocumentService } from './document.service.js'
 import { AppError } from '../../utils/errors/app-error.js'
 import { DocumentModel } from './document.model.js'
-import { CreateDocumentModelInput } from '@srgdj/shared'
+import {
+  CreateDocumentModelInput,
+  type FindAllDocumentsQuery,
+} from '@srgdj/shared'
 
 export class DocumentController {
   private readonly documentService: DocumentService
@@ -12,19 +15,16 @@ export class DocumentController {
   }
 
   findAll = async (req: Request, res: Response) => {
-    const results = await this.documentService.findAll({
-      page: req.query.page ? Number(req.query.page) : 1,
-      pageSize: req.query.pageSize ? Number(req.query.pageSize) : 30,
-      query: req.query.query?.toString(),
-    })
+    const { page, pageSize, query, statusId, documentTypeId } =
+      req.query as unknown as FindAllDocumentsQuery
 
-    if (!results) {
-      throw new AppError({
-        message: 'No documents found',
-        statusCode: 404,
-        code: 'DOCUMENTS_NOT_FOUND',
-      })
-    }
+    const results = await this.documentService.findAll({
+      page,
+      pageSize,
+      query,
+      statusId,
+      documentTypeId,
+    })
 
     res.json(results)
   }

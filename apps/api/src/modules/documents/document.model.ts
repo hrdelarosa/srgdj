@@ -23,6 +23,8 @@ export class DocumentModel {
     page,
     pageSize,
     query,
+    statusId,
+    documentTypeId,
   }: FindAllDocumentsParams): Promise<PaginatedResponse<DocumentListItem>> {
     const currentPage = page ?? 1
     const limit = pageSize ?? 30
@@ -37,6 +39,8 @@ export class DocumentModel {
             like(documents.defendant, `%${query}%`),
           )
         : undefined,
+      statusId ? eq(documents.currentStatusId, statusId) : undefined,
+      documentTypeId ? eq(documents.documentTypeId, documentTypeId) : undefined,
     ].filter(Boolean)
 
     const where = and(...filters)
@@ -102,11 +106,14 @@ export class DocumentModel {
       .from(documents)
       .where(where)
 
+    const total = totalResult?.total ?? 0
+
     return {
       items,
       page: currentPage,
       pageSize: limit,
-      total: totalResult?.total ?? 0,
+      total,
+      totalPages: limit > 0 ? Math.ceil(total / limit) : 0,
     }
   }
 

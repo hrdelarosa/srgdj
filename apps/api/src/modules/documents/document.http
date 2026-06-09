@@ -1,5 +1,17 @@
-### Obtiene todos los documentos
+### Obtiene todos los documentos (paginado)
 GET http://localhost:3000/api/v1/documents
+
+### Paginación: página 2, 10 documentos por página
+GET http://localhost:3000/api/v1/documents?page=2&pageSize=10
+
+### Búsqueda por texto (oficio, expediente, actor o demandado)
+GET http://localhost:3000/api/v1/documents?query=INM
+
+### Filtrar por tipo y estado de documento
+GET http://localhost:3000/api/v1/documents?documentTypeId=019e9bc2-a9cd-74e0-bcc6-89bd3dd7c001&statusId=019e9bc2-a9d0-72f2-a385-2c5d1dd3310f
+
+### Combinar paginación, búsqueda y filtros
+GET http://localhost:3000/api/v1/documents?page=1&pageSize=20&query=González&statusId=019e9bc2-a9d0-72f2-a385-2c5d1dd3310f
 
 ### Obtiene solo el documento por el id
 GET http://localhost:3000/api/v1/documents/1

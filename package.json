@@ -10,7 +10,8 @@
     "build:web": "pnpm --filter web build",
     "build:api": "pnpm --filter api build",
     "build:shared": "pnpm --filter @srgdj/shared build",
-    "build": "pnpm build:shared && pnpm build:web && pnpm build:api"
+    "build": "pnpm build:shared && pnpm build:web && pnpm build:api",
+    "test:api": "pnpm --filter api test"
   },
   "devDependencies": {
     "typescript": "^6.0.3"

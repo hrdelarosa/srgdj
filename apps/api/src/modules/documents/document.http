@@ -38,13 +38,36 @@ Content-Type: application/json
 }
 
 ### Actualiza un documento existente
-PATCH http://localhost:3000/api/v1/documents/019e9bc2-aa31-7579-8b80-e9ed2450ecb3
+PATCH http://localhost:3000/api/v1/documents/019eaa17-b53b-76fa-9cd4-6ab4566f3436
 Content-Type: application/json
 
 {
-  "observations": "Observación actualizada desde PATCH",
-  "annexes": "Anexo actualizado"
+  "currentStatusId": "019eaa17-b4c6-7342-af5c-6f564f0886e5"
 }
 
 ### Elimina un documento existente (soft delete cambia el estado a 'deletedAt' sin eliminar físicamente el registro)
 PATCH http://localhost:3000/api/v1/documents/delete/019e9bc2-aa31-7579-8b80-e9ed2450ecb3
+
+
+### Eventos de documentos
+### Obtiene los eventos asociados a un documento específico por su id
+GET http://localhost:3000/api/v1/documents/019eaa17-b53b-76fa-9cd4-64ef6b150ba1/events
+
+### Crea un nuevo evento para un documento específico
+POST http://localhost:3000/api/v1/documents/019eaa17-b53b-76fa-9cd4-64ef6b150ba1/events
+Content-Type: application/json
+
+{
+  "eventType": "NOTE_ADDED",
+  "note": "Se agregó una observación de prueba."
+}
+
+### Para cambiar el estado
+POST http://localhost:3000/api/v1/documents/019eaa17-b53b-76fa-9cd4-64ef6b150ba1/events
+Content-Type: application/json
+
+{
+  "eventType": "STATUS_CHANGED",
+  "toStatusId": "019eaa17-b4c6-7342-af5c-6f564f0886e5",
+  "note": "Documento concluido."
+}

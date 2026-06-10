@@ -4,6 +4,7 @@ import {
   CreateDocumentModelInput,
   UpdateDocumentModelInput,
 } from '@srgdj/shared'
+import { CreateDocumentEventInput, DocumentQuery } from './document.schema.js'
 
 export class DocumentService {
   private readonly documentModel: typeof DocumentModel
@@ -12,24 +13,16 @@ export class DocumentService {
     this.documentModel = documentModel
   }
 
-  findAll = async ({
-    page,
-    pageSize,
-    query,
-    statusId,
-    documentTypeId,
-  }: FindAllDocumentsParams) => {
-    return this.documentModel.findAll({
-      page,
-      pageSize,
-      query,
-      statusId,
-      documentTypeId,
-    })
+  findAll = async (query: DocumentQuery) => {
+    return this.documentModel.findAll(query)
   }
 
   findById = async ({ id }: { id: string }) => {
     return this.documentModel.findById({ id })
+  }
+
+  findByOfficeNumber = async ({ officeNumber }: { officeNumber: string }) => {
+    return this.documentModel.findByOfficeNumber({ officeNumber })
   }
 
   create = async ({ document }: { document: CreateDocumentModelInput }) => {
@@ -53,34 +46,18 @@ export class DocumentService {
   remove = async ({ id }: { id: string }) => {
     return await this.documentModel.remove({ id })
   }
+
+  findEventsByDocumentId = async ({ id }: { id: string }) => {
+    return this.documentModel.findEventsByDocumentId({ id })
+  }
+
+  createEvent = async ({
+    id,
+    data,
+  }: {
+    id: string
+    data: CreateDocumentEventInput
+  }) => {
+    return this.documentModel.createEvent({ id, data })
+  }
 }
-
-// import { documentRepository } from './document.repository.js'
-
-// type FindAllDocumentsParams = {
-//   q?: string
-//   page?: number
-//   pageSize?: number
-// }
-
-// export const documentService = {
-//   async findAll({ params }: { params: FindAllDocumentsParams }) {
-//     return documentRepository.findAll({ params })
-//   },
-
-//   async findById({ id }: { id: string }) {
-//     return documentRepository.findById({ id })
-//   },
-
-//   async create(data: unknown) {
-//     return documentRepository.create(data)
-//   },
-
-//   async update(id: number, data: unknown) {
-//     return documentRepository.update(id, data)
-//   },
-
-//   async remove(id: number) {
-//     return documentRepository.remove(id)
-//   },
-// }

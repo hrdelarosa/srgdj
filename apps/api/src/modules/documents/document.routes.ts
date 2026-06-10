@@ -8,6 +8,10 @@ import {
   findAllDocumentsQuerySchema,
   updateDocumentSchema,
 } from '@srgdj/shared'
+import {
+  createDocumentEventSchema,
+  documentQuerySchema,
+} from './document.schema.js'
 
 export const documentRoutes = Router()
 const documentController = new DocumentController({
@@ -16,7 +20,7 @@ const documentController = new DocumentController({
 
 documentRoutes.get(
   '/',
-  validateRequest({ query: findAllDocumentsQuerySchema }),
+  validateRequest({ query: documentQuerySchema }),
   documentController.findAll,
 )
 documentRoutes.get(
@@ -46,4 +50,18 @@ documentRoutes.delete(
   '/remove/:id',
   validateRequest({ params: documentIdParamsSchema }),
   documentController.remove,
+)
+
+documentRoutes.get(
+  '/:id/events',
+  validateRequest({ params: documentIdParamsSchema }),
+  documentController.findEventsByDocumentId,
+)
+documentRoutes.post(
+  '/:id/events',
+  validateRequest({
+    params: documentIdParamsSchema,
+    body: createDocumentEventSchema,
+  }),
+  documentController.createEvent,
 )

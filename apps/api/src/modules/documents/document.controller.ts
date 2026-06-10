@@ -2,10 +2,8 @@ import type { Request, Response } from 'express'
 import { DocumentService } from './document.service.js'
 import { AppError } from '../../utils/errors/app-error.js'
 import { DocumentModel } from './document.model.js'
-import {
-  CreateDocumentModelInput,
-  type FindAllDocumentsQuery,
-} from '@srgdj/shared'
+import { CreateDocumentModelInput } from '@srgdj/shared'
+import { DocumentQuery } from './document.schema.js'
 
 export class DocumentController {
   private readonly documentService: DocumentService
@@ -15,16 +13,8 @@ export class DocumentController {
   }
 
   findAll = async (req: Request, res: Response) => {
-    const { page, pageSize, query, statusId, documentTypeId } =
-      req.query as unknown as FindAllDocumentsQuery
-
-    const results = await this.documentService.findAll({
-      page,
-      pageSize,
-      query,
-      statusId,
-      documentTypeId,
-    })
+    const query = req.query as unknown as DocumentQuery
+    const results = await this.documentService.findAll(query)
 
     res.json(results)
   }
@@ -56,11 +46,11 @@ export class DocumentController {
       })
     }
 
-    const documentExists = await this.documentService.findAll({
-      query: documentReq.officeNumber,
+    const documentExists = await this.documentService.findByOfficeNumber({
+      officeNumber: documentReq.officeNumber,
     })
 
-    if (documentExists.items.length > 0) {
+    if (documentExists) {
       throw new AppError({
         message: 'Document with the same office number already exists',
         statusCode: 400,
@@ -84,7 +74,7 @@ export class DocumentController {
   }
 
   update = async (req: Request, res: Response) => {
-    const userId = '019e9bc2-a9d6-74c9-adad-9cad76f1d9e1'
+    const userId = '019eaa17-b4cc-75af-bcac-6f20f12451ef'
 
     if (!userId) {
       throw new AppError({
@@ -144,5 +134,22 @@ export class DocumentController {
     const id = req.params.id as string
     await this.documentService.remove({ id })
     res.status(204).send()
+  }
+
+  findEventsByDocumentId = async (req: Request, res: Response) => {
+    const id = req.params.id as string
+    console.log('Finding events for document ID:', id)
+    const events = await this.documentService.findEventsByDocumentId({ id })
+
+    res.json({
+      items: events,
+    })
+  }
+
+  createEvent = async (req: Request, res: Response) => {
+    const id = req.params.id as string
+    const event = await this.documentService.createEvent({ id, data: req.body })
+
+    res.status(201).json(event)
   }
 }

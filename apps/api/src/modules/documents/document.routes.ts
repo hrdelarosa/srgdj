@@ -12,12 +12,14 @@ import {
   createDocumentEventSchema,
   documentQuerySchema,
 } from './document.schema.js'
+import { requireAuth } from '../../middlewares/require-auth.js'
 
 export const documentRoutes = Router()
 const documentController = new DocumentController({
   documentModel: DocumentModel,
 })
 
+documentRoutes.use(requireAuth)
 documentRoutes.get(
   '/',
   validateRequest({ query: documentQuerySchema }),

@@ -20,4 +20,16 @@ export class AuthController {
 
     res.json(result)
   }
+
+  me = async (req: Request, res: Response) => {
+    res.json({
+      user: req.user,
+    })
+  }
+
+  logout = async (req: Request, res: Response) => {
+    await this.authService.logout({ sessionId: req.sessionId! })
+
+    res.status(204).send()
+  }
 }

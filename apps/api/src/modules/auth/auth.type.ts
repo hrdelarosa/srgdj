@@ -15,4 +15,5 @@ export type AuthUser = {
     code: string
     name: string
   }
+  permissions: string[]
 }

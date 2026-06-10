@@ -71,11 +71,18 @@ export const requireAuth: RequestHandler = async (req, res, next) => {
 
     await AuthModel.touchSession({ sessionId: session.id, date: now })
 
+    const permissions = await AuthModel.findPermissionsByRoleId({
+      roleId: session.user.role.id,
+    })
+
     req.user = {
       id: session.user.id,
       username: session.user.username,
       role: session.user.role,
+      permissions: permissions.map((permission) => permission.code),
     }
+
+    req.sessionId = session.id
 
     next()
   } catch (err) {

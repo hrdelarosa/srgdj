@@ -87,4 +87,8 @@ export class AuthService {
       },
     }
   }
+
+  logout = async ({ sessionId }: { sessionId: string }) => {
+    await this.authModel.revokeSession({ sessionId })
+  }
 }

@@ -1,6 +1,12 @@
 import { eq } from 'drizzle-orm'
 import { db } from '../../database/db.js'
-import { roles, users, userSessions } from '../../database/schema.js'
+import {
+  permissions,
+  rolePermissions,
+  roles,
+  users,
+  userSessions,
+} from '../../database/schema.js'
 import { CreateSession } from './auth.type.js'
 
 export class AuthModel {
@@ -91,5 +97,13 @@ export class AuthModel {
       .update(userSessions)
       .set({ revokedAt: new Date() })
       .where(eq(userSessions.id, sessionId))
+  }
+
+  static async findPermissionsByRoleId({ roleId }: { roleId: string }) {
+    return db
+      .select({ code: permissions.code })
+      .from(rolePermissions)
+      .innerJoin(permissions, eq(rolePermissions.permissionId, permissions.id))
+      .where(eq(rolePermissions.roleId, roleId))
   }
 }

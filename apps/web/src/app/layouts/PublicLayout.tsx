@@ -1,10 +1,14 @@
+import PublicHeader from '@/shared/components/PublicHeader'
+
 export function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
-      <div className="flex w-full max-w-md flex-col gap-3">
-        <h1>Sistema de Control de Documentos Jurídicos</h1>
+    <div className="relative min-h-svh">
+      <PublicHeader />
 
-        {children}
+      <div className="flex h-screen  flex-col items-center justify-center gap-6 p-6 md:p-10">
+        <section className="flex w-full max-w-md flex-col gap-3">
+          {children}
+        </section>
       </div>
     </div>
   )

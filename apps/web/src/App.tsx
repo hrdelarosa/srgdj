@@ -1,36 +1,19 @@
 import './App.css'
-import { useState } from 'react'
-import { USER_ROLES, type UserRole } from '@srgdj/shared'
-
-import { Button } from './components/ui/button'
+import TableDocuments from './modules/documents/components/TableDocuments'
 
 function App() {
-  const [role, setRole] = useState<UserRole>(USER_ROLES.USER)
-  const handleClick = () => {
-    setRole(
-      USER_ROLES[role as keyof typeof USER_ROLES] === USER_ROLES.USER
-        ? USER_ROLES.MANAGER
-        : USER_ROLES.USER,
-    )
-    setRole(
-      USER_ROLES[role as keyof typeof USER_ROLES] === USER_ROLES.MANAGER
-        ? USER_ROLES.ADMIN
-        : USER_ROLES.MANAGER,
-    )
-    setRole(
-      USER_ROLES[role as keyof typeof USER_ROLES] === USER_ROLES.ADMIN
-        ? USER_ROLES.USER
-        : USER_ROLES.ADMIN,
-    )
-  }
   return (
-    <div>
-      <h1>SRGDJ</h1>
-      <Button onClick={handleClick}>view next role</Button>
-      {/* <button onClick={handleClick}>view next role</button> */}
+    <main className="py-4 px-8">
+      <h1 className="text-2xl font-semibold">
+        {' '}
+        Sistema de Registro y Gestión de Documentos Jurídicos
+      </h1>
+      <p className="mt-1 text-sm text-gray-500">
+        Oficina de Representación del INM Guerrero
+      </p>
 
-      <p>{role}</p>
-    </div>
+      <TableDocuments />
+    </main>
   )
 }
 

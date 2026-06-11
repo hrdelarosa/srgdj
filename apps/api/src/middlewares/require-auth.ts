@@ -86,6 +86,26 @@ export const requireAuth: RequestHandler = async (req, res, next) => {
 
     next()
   } catch (err) {
+    if (err instanceof jwt.TokenExpiredError) {
+      return next(
+        new AppError({
+          message: 'Token expirado',
+          statusCode: 401,
+          code: 'TOKEN_EXPIRED',
+        }),
+      )
+    }
+
+    if (err instanceof jwt.JsonWebTokenError) {
+      return next(
+        new AppError({
+          message: 'Token inválido',
+          statusCode: 401,
+          code: 'INVALID_TOKEN',
+        }),
+      )
+    }
+
     next(err)
   }
 }

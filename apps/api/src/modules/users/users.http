@@ -1,0 +1,20 @@
+### Obtiene todos los usuarios
+GET http://localhost:3000/api/v1/users
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTllYWExNy1iNGNjLTc1YWYtYmNhYy02ODQ5MzBkNDg5YTEiLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzgxMTUzNjEyLCJleHAiOjE3ODExNTcyMTJ9.DCZK1zM45_B8ZftQPSRw9hRp6J9LeruADgE5Ybvshso
+
+### Obtiene solo el usuario por el id
+GET http://localhost:3000/api/v1/users/019eaa17-b4cc-75af-bcac-7196b7d83fd7
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTllYWExNy1iNGNjLTc1YWYtYmNhYy02ODQ5MzBkNDg5YTEiLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzgxMTUzNjEyLCJleHAiOjE3ODExNTcyMTJ9.DCZK1zM45_B8ZftQPSRw9hRp6J9LeruADgE5Ybvshso
+
+### Crea un nuevo usuario
+POST http://localhost:3000/api/v1/users
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTllYWExNy1iNGNjLTc1YWYtYmNhYy02ODQ5MzBkNDg5YTEiLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzgxMTUzNjEyLCJleHAiOjE3ODExNTcyMTJ9.DCZK1zM45_B8ZftQPSRw9hRp6J9LeruADgE5Ybvshso
+Content-Type: application/json
+
+{
+  "username": "capturista.demo",
+  "password": "Demo12345*",
+  "fullName": "Capturista Demo",
+  "roleId": "019eaa17-b4a9-70fb-aa09-14f3b1c0f522",
+  "mustChangePassword": true
+}

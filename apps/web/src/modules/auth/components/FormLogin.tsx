@@ -47,9 +47,10 @@ export default function FormLogin() {
             <PasswordInput
               {...register('password')}
               id="password"
+              label="Contraseña"
               error={errors.password?.message}
               autoComplete="current-password"
-            ></PasswordInput>
+            />
           </FieldGroup>
         </Field>
 

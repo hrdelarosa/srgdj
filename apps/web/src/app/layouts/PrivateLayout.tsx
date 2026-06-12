@@ -3,6 +3,7 @@ import { Link } from 'wouter'
 
 import { useLogout } from '@/modules/auth/hooks/useLogout'
 import { useAuthStore } from '@/modules/auth/store/auth.store'
+import { Button } from '@/shared/components/ui/button'
 
 type PrivateLayoutProps = {
   children: ReactNode
@@ -18,7 +19,9 @@ export function PrivateLayout({ children }: PrivateLayoutProps) {
         <h2>SRGDJ</h2>
 
         <nav>
-          <Link href="/home">Home</Link>
+          <Link href="/home">
+            <Button variant="link">Home</Button>
+          </Link>
         </nav>
       </aside>
 
@@ -26,12 +29,12 @@ export function PrivateLayout({ children }: PrivateLayoutProps) {
         <header>
           <span>{user?.fullName}</span>
 
-          <button
+          <Button
             onClick={() => logoutMutation.mutate()}
             disabled={logoutMutation.isPending}
           >
             Cerrar sesión
-          </button>
+          </Button>
         </header>
 
         {children}

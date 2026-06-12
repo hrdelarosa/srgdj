@@ -15,16 +15,12 @@ export function useLogin() {
     },
     onSuccess: (data) => {
       setSession(data)
-      setLocation('/dashboard')
+      setLocation('/home')
     },
     onError: (error: {
       error: { message: string; statusCode: number; code: string }
     }) => {
-      toast.error(
-        error.error.message
-          ? error.error.message
-          : 'Usuario o contraseña incorrectos',
-      )
+      toast.error(error.error.message ?? 'Usuario o contraseña incorrectos')
     },
   })
 }

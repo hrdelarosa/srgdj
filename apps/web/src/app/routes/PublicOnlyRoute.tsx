@@ -6,7 +6,7 @@ export function PublicOnlyRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuthStore()
 
   if (isAuthenticated) {
-    return <Redirect to="/dashboard" />
+    return <Redirect to="/home" />
   }
 
   return <PublicLayout>{children}</PublicLayout>

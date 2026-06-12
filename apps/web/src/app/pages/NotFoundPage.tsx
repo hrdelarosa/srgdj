@@ -5,7 +5,7 @@ export function NotFoundPage() {
     <section>
       <h1>404</h1>
       <p>Página no encontrada</p>
-      <Link href="/dashboard">Volver al inicio</Link>
+      <Link href="/home">Volver al inicio</Link>
     </section>
   )
 }

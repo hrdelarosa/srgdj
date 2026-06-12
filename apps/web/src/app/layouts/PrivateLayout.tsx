@@ -18,7 +18,7 @@ export function PrivateLayout({ children }: PrivateLayoutProps) {
         <h2>SRGDJ</h2>
 
         <nav>
-          <Link href="/dashboard">Dashboard</Link>
+          <Link href="/home">Home</Link>
         </nav>
       </aside>
 

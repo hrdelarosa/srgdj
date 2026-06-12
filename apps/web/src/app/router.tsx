@@ -1,7 +1,7 @@
 import { Redirect, Route, Switch } from 'wouter'
 import { PublicOnlyRoute } from './routes/PublicOnlyRoute'
 import { PrivateRoute } from './routes/PrivateRoute'
-import { DashboardPage } from './pages/Home'
+import { HomePage } from './pages/Home'
 import { LoginPage } from './pages/Login'
 import { NotFoundPage } from './pages/NotFoundPage'
 
@@ -9,7 +9,7 @@ export function AppRouter() {
   return (
     <Switch>
       <Route path="/">
-        <Redirect to="/dashboard" />
+        <Redirect to="/home" />
       </Route>
 
       <Route path="/login">
@@ -18,9 +18,9 @@ export function AppRouter() {
         </PublicOnlyRoute>
       </Route>
 
-      <Route path="/dashboard">
+      <Route path="/home">
         <PrivateRoute>
-          <DashboardPage />
+          <HomePage />
         </PrivateRoute>
       </Route>
 

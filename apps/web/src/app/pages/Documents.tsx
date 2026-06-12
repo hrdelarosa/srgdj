@@ -4,18 +4,17 @@ import { DocumentsPagination } from '@/modules/documents/components/DocumentsPag
 import { DocumentsTable } from '@/modules/documents/components/DocumentsTable'
 import { useDocumentFilters } from '@/modules/documents/hooks/useDocumentFilters'
 import { useDocuments } from '@/modules/documents/hooks/useDocuments'
-import { useDebouncedValue } from '@/shared/hooks/useDebouncedValue'
+import { useDebounced } from '@/shared/hooks/useDebounced'
 
 export function DocumentsPage() {
   const { filters, inputQuery, updateFilter, setDebouncedQuery, setPage } =
     useDocumentFilters()
 
-  const debouncedQuery = useDebouncedValue(inputQuery, 400)
+  const debouncedQuery = useDebounced(inputQuery, 400)
 
-  // Cuando el valor debounced cambia, actualizamos los filtros de la API
   useEffect(() => {
     setDebouncedQuery(debouncedQuery)
-  }, [debouncedQuery]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [debouncedQuery])
 
   const documentsQuery = useDocuments({ ...filters, query: debouncedQuery })
 

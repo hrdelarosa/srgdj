@@ -1,6 +1,17 @@
 import { z } from 'zod'
 
-const uuidSchema = z.string().trim().min(1, 'Id es requerido').max(36)
+const uuidSchema = (message = 'Id es requerido') =>
+  z
+    .string()
+    .trim()
+    .min(1, message)
+    .max(36, 'El id no puede superar 36 caracteres')
+
+const optionalIdSchema = z
+  .string()
+  .trim()
+  .optional()
+  .transform((value) => (value === '' ? undefined : value))
 
 const optionalTextSchema = z
   .string()
@@ -30,17 +41,19 @@ export const createDocumentSchema = z.object({
     'El demandado no puede superar 255 caracteres',
   ),
 
-  documentTypeId: uuidSchema,
+  documentTypeId: uuidSchema('El tipo de documento es requerido'),
 
   officeDate: z.coerce.date().optional(),
 
-  receivedDate: z.coerce.date(),
+  receivedDate: z.coerce.date({
+    error: 'La fecha de recibido es obligatoria o no es válida',
+  }),
 
   annexes: optionalTextSchema,
 
-  physicalLocationId: uuidSchema.optional(),
+  physicalLocationId: optionalIdSchema,
 
-  currentStatusId: uuidSchema,
+  currentStatusId: uuidSchema('El estatus inicial es requerido'),
 
   observations: optionalTextSchema,
 })
@@ -48,7 +61,7 @@ export const createDocumentSchema = z.object({
 export const updateDocumentSchema = createDocumentSchema.partial()
 
 export const documentIdParamsSchema = z.object({
-  id: uuidSchema,
+  id: uuidSchema('El id del documento es requerido'),
 })
 
 export const findAllDocumentsQuerySchema = z.object({
@@ -59,11 +72,13 @@ export const findAllDocumentsQuerySchema = z.object({
     .trim()
     .optional()
     .transform((value) => (value === '' ? undefined : value)),
-  statusId: uuidSchema.optional(),
-  documentTypeId: uuidSchema.optional(),
+  statusId: optionalIdSchema,
+  documentTypeId: optionalIdSchema,
 })
 
-export type CreateDocumentInput = z.infer<typeof createDocumentSchema>
+export type CreateDocumentFormInput = z.input<typeof createDocumentSchema>
+export type CreateDocumentInput = z.output<typeof createDocumentSchema>
+// export type CreateDocumentInput = z.infer<typeof createDocumentSchema>
 export type UpdateDocumentInput = z.infer<typeof updateDocumentSchema>
 export type DocumentIdParams = z.infer<typeof documentIdParamsSchema>
 export type FindAllDocumentsQuery = z.infer<typeof findAllDocumentsQuerySchema>

@@ -4,6 +4,7 @@ import type {
   DocumentListItem,
   FindAllDocumentsParams,
   PaginatedResponse,
+  UpdateDocumentInput,
 } from '@srgdj/shared'
 import type { DocumentDetail } from '../types/document.types'
 
@@ -41,6 +42,19 @@ export function getDocumentById(id: string) {
 export function createDocument({ data }: { data: CreateDocumentInput }) {
   return apiClient<DocumentDetail>('/documents', {
     method: 'POST',
+    body: JSON.stringify(data),
+  })
+}
+
+export function updateDocument({
+  id,
+  data,
+}: {
+  id: string
+  data: UpdateDocumentInput
+}) {
+  return apiClient<DocumentDetail>(`/documents/${id}`, {
+    method: 'PATCH',
     body: JSON.stringify(data),
   })
 }

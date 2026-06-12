@@ -7,6 +7,7 @@ import { NotFoundPage } from './pages/NotFoundPage'
 import { DocumentsPage } from './pages/Documents'
 import { DocumentDetailPage } from './pages/DocumentDetail'
 import { CreateDocumentPage } from './pages/CreateDocument'
+import { EditDocumentPage } from './pages/EditDocument'
 
 export function AppRouter() {
   return (
@@ -36,6 +37,12 @@ export function AppRouter() {
       <Route path="/documents/new">
         <PrivateRoute>
           <CreateDocumentPage />
+        </PrivateRoute>
+      </Route>
+
+      <Route path="/documents/:id/edit">
+        <PrivateRoute>
+          <EditDocumentPage />
         </PrivateRoute>
       </Route>
 

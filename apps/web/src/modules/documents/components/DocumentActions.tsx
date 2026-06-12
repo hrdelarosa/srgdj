@@ -39,7 +39,9 @@ export function DocumentActions({ documentId }: Props) {
             Detalles
           </DropdownMenuItem>
 
-          <DropdownMenuItem onClick={() => console.log('edit', documentId)}>
+          <DropdownMenuItem
+            onClick={() => setLocation(`/documents/${documentId}/edit`)}
+          >
             <PencilLine />
             Editar
           </DropdownMenuItem>

@@ -4,13 +4,13 @@ import type {
   FindAllDocumentsParams,
   PaginatedResponse,
 } from '@srgdj/shared'
+import type { DocumentDetail } from '../types/document.types'
 
 function buildDocumentsQuery(params?: FindAllDocumentsParams) {
   if (!params) return ''
 
   const searchParams = new URLSearchParams()
 
-  // Mapeo de nombres del frontend a los nombres que espera el backend
   const { query, statusId, documentTypeId, ...rest } = params
 
   if (query) searchParams.set('q', query)
@@ -33,3 +33,6 @@ export function getDocuments(params?: FindAllDocumentsParams) {
   )
 }
 
+export function getDocumentById(id: string) {
+  return apiClient<DocumentDetail>(`/documents/${id}`)
+}

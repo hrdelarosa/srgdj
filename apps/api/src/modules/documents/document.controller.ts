@@ -35,7 +35,7 @@ export class DocumentController {
   }
 
   create = async (req: Request, res: Response) => {
-    const userId = '019e9bc2-a9d6-74c9-adad-9cad76f1d9e1'
+    const userId = req.user?.id
     const documentReq: CreateDocumentModelInput = req.body
 
     if (!userId) {
@@ -74,7 +74,7 @@ export class DocumentController {
   }
 
   update = async (req: Request, res: Response) => {
-    const userId = '019eaa17-b4cc-75af-bcac-6f20f12451ef'
+    const userId = req.user?.id as string
 
     if (!userId) {
       throw new AppError({
@@ -102,7 +102,7 @@ export class DocumentController {
   }
 
   delete = async (req: Request, res: Response) => {
-    const userId = '019e9bc2-a9d6-74c9-adad-9cad76f1d9e1'
+    const userId = req.user?.id as string
 
     if (!userId) {
       throw new AppError({
@@ -138,7 +138,6 @@ export class DocumentController {
 
   findEventsByDocumentId = async (req: Request, res: Response) => {
     const id = req.params.id as string
-    console.log('Finding events for document ID:', id)
     const events = await this.documentService.findEventsByDocumentId({ id })
 
     res.json({

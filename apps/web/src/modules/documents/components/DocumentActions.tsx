@@ -1,5 +1,6 @@
 import { Eye, MoreHorizontal, PencilLine, Trash } from 'lucide-react'
 
+import { useLocation } from 'wouter'
 import { Button } from '@/shared/components/ui/button'
 import {
   DropdownMenu,
@@ -11,11 +12,13 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu'
 
-type DocumentActionsProps = {
+interface Props {
   documentId: string
 }
 
-export function DocumentActions({ documentId }: DocumentActionsProps) {
+export function DocumentActions({ documentId }: Props) {
+  const [, setLocation] = useLocation()
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -29,7 +32,9 @@ export function DocumentActions({ documentId }: DocumentActionsProps) {
         <DropdownMenuLabel>Acciones</DropdownMenuLabel>
 
         <DropdownMenuGroup>
-          <DropdownMenuItem onClick={() => console.log('details', documentId)}>
+          <DropdownMenuItem
+            onClick={() => setLocation(`/documents/${documentId}`)}
+          >
             <Eye />
             Detalles
           </DropdownMenuItem>

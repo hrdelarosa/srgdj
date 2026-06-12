@@ -14,7 +14,7 @@ export function DocumentsPage() {
 
   useEffect(() => {
     setDebouncedQuery(debouncedQuery)
-  }, [debouncedQuery])
+  }, [debouncedQuery, setDebouncedQuery])
 
   const documentsQuery = useDocuments({ ...filters, query: debouncedQuery })
 

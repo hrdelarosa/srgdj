@@ -40,12 +40,13 @@ Content-Type: application/json
 }
 
 ### Actualiza un documento existente
-PATCH http://localhost:3000/api/v1/documents/019eaa17-b53b-76fa-9cd4-5e0ca1158631
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTllYWExNy1iNGNjLTc1YWYtYmNhYy02ODQ5MzBkNDg5YTEiLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzgxMTMxMjI4LCJleHAiOjE3ODExMzQ4Mjh9.gLDYAfthQJd2qJ3FXNcp8Qj3SDGz7mhGO8u-ZcNyuHQ
+PATCH http://localhost:3000/api/v1/documents/019ebc75-36c2-760d-82f7-c24ae23ae6ad
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTllYWExNy1iNGNjLTc1YWYtYmNhYy02ODQ5MzBkNDg5YTEiLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzgxMjc4MTQ5LCJleHAiOjE3ODEyODE3NDl9.1_hJ7JzVE0d5CveilMHtvfBo4ZDsR5vPkS-P0oqi2BM
 Content-Type: application/json
 
 {
-  "currentStatusId": "019eaa17-b4c6-7342-af5c-6f564f0886e5"
+  "currentStatusId": "019eaa17-b4c6-7342-af5c-6a7efec37b4f",
+  "observations": "Se actualizó el estado del documento a 'En revisión'."
 }
 
 ### Elimina un documento existente (soft delete cambia el estado a 'deletedAt' sin eliminar físicamente el registro)

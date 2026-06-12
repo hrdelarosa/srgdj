@@ -58,3 +58,9 @@ export function updateDocument({
     body: JSON.stringify(data),
   })
 }
+
+export function deleteDocument({ id }: { id: string }) {
+  return apiClient<void>(`/documents/delete/${id}`, {
+    method: 'PATCH',
+  })
+}

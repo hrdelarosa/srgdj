@@ -11,6 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu'
+import { useDeleteDocument } from '../hooks/useDeleteDocument'
 
 interface Props {
   documentId: string
@@ -18,6 +19,7 @@ interface Props {
 
 export function DocumentActions({ documentId }: Props) {
   const [, setLocation] = useLocation()
+  const deleteMutation = useDeleteDocument()
 
   return (
     <DropdownMenu>
@@ -52,7 +54,16 @@ export function DocumentActions({ documentId }: Props) {
         <DropdownMenuGroup>
           <DropdownMenuItem
             variant="destructive"
-            onClick={() => console.log('delete', documentId)}
+            disabled={deleteMutation.isPending}
+            onClick={() => {
+              const confirmed = window.confirm(
+                '¿Seguro que deseas eliminar este documento? Esta acción lo ocultará del listado, pero no lo borrará definitivamente.',
+              )
+
+              if (!confirmed) return
+
+              deleteMutation.mutate({ id: documentId })
+            }}
           >
             <Trash />
             Eliminar

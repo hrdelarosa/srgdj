@@ -1,5 +1,6 @@
 import { apiClient } from '@/shared/api/api-client'
 import type {
+  CreateDocumentInput,
   DocumentListItem,
   FindAllDocumentsParams,
   PaginatedResponse,
@@ -35,4 +36,11 @@ export function getDocuments(params?: FindAllDocumentsParams) {
 
 export function getDocumentById(id: string) {
   return apiClient<DocumentDetail>(`/documents/${id}`)
+}
+
+export function createDocument({ data }: { data: CreateDocumentInput }) {
+  return apiClient<DocumentDetail>('/documents', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
 }

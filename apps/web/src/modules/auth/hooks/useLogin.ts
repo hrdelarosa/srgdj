@@ -4,6 +4,7 @@ import { authService } from '../services/auth.service'
 import { useAuthStore } from '../store/auth.store'
 import type { LoginInput } from '../types/auth.types'
 import { toast } from 'sonner'
+import type { ApiError } from '@/shared/types/errors.type'
 
 export function useLogin() {
   const [, setLocation] = useLocation()
@@ -17,9 +18,7 @@ export function useLogin() {
       setSession(data)
       setLocation('/home')
     },
-    onError: (error: {
-      error: { message: string; statusCode: number; code: string }
-    }) => {
+    onError: (error: ApiError) => {
       toast.error(error.error.message ?? 'Usuario o contraseña incorrectos')
     },
   })

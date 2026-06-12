@@ -5,12 +5,17 @@ import { DocumentsTable } from '@/modules/documents/components/DocumentsTable'
 import { useDocumentFilters } from '@/modules/documents/hooks/useDocumentFilters'
 import { useDocuments } from '@/modules/documents/hooks/useDocuments'
 import { useDebounced } from '@/shared/hooks/useDebounced'
+import {
+  useDocumentStatuses,
+  useDocumentTypes,
+} from '@/modules/documents/hooks/useDocumentCatalogs'
 
 export function DocumentsPage() {
   const { filters, inputQuery, updateFilter, setDebouncedQuery, setPage } =
     useDocumentFilters()
-
   const debouncedQuery = useDebounced(inputQuery, 400)
+  const typesQuery = useDocumentTypes()
+  const statusesQuery = useDocumentStatuses()
 
   useEffect(() => {
     setDebouncedQuery(debouncedQuery)
@@ -32,7 +37,8 @@ export function DocumentsPage() {
     <section className="mt-6">
       <DocumentsFilters
         filters={{ ...filters, query: inputQuery }}
-        documents={documentsQuery.data.items}
+        statuses={statusesQuery.data?.items ?? []}
+        types={typesQuery.data?.items ?? []}
         onChange={updateFilter}
       />
 

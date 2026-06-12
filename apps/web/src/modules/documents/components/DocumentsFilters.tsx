@@ -1,5 +1,9 @@
 import { SearchIcon } from 'lucide-react'
-import type { DocumentListItem, FindAllDocumentsParams } from '@srgdj/shared'
+import type { FindAllDocumentsParams } from '@srgdj/shared'
+import type {
+  DocumentStatusOption,
+  DocumentTypeOption,
+} from '../types/document-catalog.types'
 
 import { Field, FieldLabel } from '@/shared/components/ui/field'
 import {
@@ -9,9 +13,10 @@ import {
 } from '@/shared/components/ui/input-group'
 import { Label } from '@/shared/components/ui/label'
 
-type DocumentsFiltersProps = {
+interface Props {
   filters: FindAllDocumentsParams
-  documents: DocumentListItem[]
+  statuses: DocumentStatusOption[]
+  types: DocumentTypeOption[]
   onChange: <K extends keyof FindAllDocumentsParams>(
     key: K,
     value: FindAllDocumentsParams[K],
@@ -20,24 +25,13 @@ type DocumentsFiltersProps = {
 
 export function DocumentsFilters({
   filters,
-  documents,
+  statuses,
+  types,
   onChange,
-}: DocumentsFiltersProps) {
-  const statusOptions = Array.from(
-    new Map(
-      documents.map((doc) => [doc.currentStatus.id, doc.currentStatus]),
-    ).values(),
-  )
-
-  const typeOptions = Array.from(
-    new Map(
-      documents.map((doc) => [doc.documentType.id, doc.documentType]),
-    ).values(),
-  )
-
+}: Props) {
   return (
     <div className="mb-4 flex flex-wrap gap-4">
-      <Field className="max-w-sm min-w-[200px] flex-1">
+      <Field className="max-w-sm min-w-50 flex-1">
         <FieldLabel>Buscar documentos</FieldLabel>
 
         <InputGroup>
@@ -53,7 +47,7 @@ export function DocumentsFilters({
         </InputGroup>
       </Field>
 
-      <div className="min-w-[160px]">
+      <div className="min-w-40">
         <Label htmlFor="status-filter" className="mb-2 block">
           Estatus
         </Label>
@@ -68,7 +62,7 @@ export function DocumentsFilters({
         >
           <option value="">Todos</option>
 
-          {statusOptions.map((status) => (
+          {statuses.map((status) => (
             <option key={status.id} value={status.id}>
               {status.name}
             </option>
@@ -76,7 +70,7 @@ export function DocumentsFilters({
         </select>
       </div>
 
-      <div className="min-w-[160px]">
+      <div className="min-w-40">
         <Label htmlFor="type-filter" className="mb-2 block">
           Tipo
         </Label>
@@ -91,7 +85,7 @@ export function DocumentsFilters({
         >
           <option value="">Todos</option>
 
-          {typeOptions.map((type) => (
+          {types.map((type) => (
             <option key={type.id} value={type.id}>
               {type.name}
             </option>

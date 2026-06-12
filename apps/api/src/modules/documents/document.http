@@ -1,6 +1,6 @@
 ### Obtiene todos los documentos (paginado)
 GET http://localhost:3000/api/v1/documents
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTllYWExNy1iNGNjLTc1YWYtYmNhYy02ODQ5MzBkNDg5YTEiLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzgxMTI4MTc0LCJleHAiOjE3ODExMzE3NzR9.QFa7wXSMaexhVeVH5xLiC8klJZOjxhaNilpExGe_t5c
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTllYWExNy1iNGNjLTc1YWYtYmNhYy02ODQ5MzBkNDg5YTEiLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzgxMTMxMjI4LCJleHAiOjE3ODExMzQ4Mjh9.gLDYAfthQJd2qJ3FXNcp8Qj3SDGz7mhGO8u-ZcNyuHQ
 
 ### Paginación: página 2, 10 documentos por página
 GET http://localhost:3000/api/v1/documents?page=2&pageSize=10
@@ -15,7 +15,8 @@ GET http://localhost:3000/api/v1/documents?documentTypeId=019e9bc2-a9cd-74e0-bcc
 GET http://localhost:3000/api/v1/documents?page=1&pageSize=20&query=González&statusId=019e9bc2-a9d0-72f2-a385-2c5d1dd3310f
 
 ### Obtiene solo el documento por el id
-GET http://localhost:3000/api/v1/documents/1
+GET http://localhost:3000/api/v1/documents/019eaa17-b53b-76fa-9cd4-5e0ca1158631
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTllYWExNy1iNGNjLTc1YWYtYmNhYy02ODQ5MzBkNDg5YTEiLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzgxMTMxMjI4LCJleHAiOjE3ODExMzQ4Mjh9.gLDYAfthQJd2qJ3FXNcp8Qj3SDGz7mhGO8u-ZcNyuHQ
 
 ### Esto es un error ya que esa id no existe 
 GET http://localhost:3000/api/v1/no-existe
@@ -39,7 +40,8 @@ Content-Type: application/json
 }
 
 ### Actualiza un documento existente
-PATCH http://localhost:3000/api/v1/documents/019eaa17-b53b-76fa-9cd4-6ab4566f3436
+PATCH http://localhost:3000/api/v1/documents/019eaa17-b53b-76fa-9cd4-5e0ca1158631
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTllYWExNy1iNGNjLTc1YWYtYmNhYy02ODQ5MzBkNDg5YTEiLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzgxMTMxMjI4LCJleHAiOjE3ODExMzQ4Mjh9.gLDYAfthQJd2qJ3FXNcp8Qj3SDGz7mhGO8u-ZcNyuHQ
 Content-Type: application/json
 
 {

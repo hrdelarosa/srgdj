@@ -1,16 +1,7 @@
-### Inicio de sesión 
-POST http://localhost:3000/api/v1/auth/login
-Content-Type: application/json
-  
-{
-  "username": "admin",
-  "password": "Admin123*"
-}
-
-### Obtiene información del usuario autenticado
-GET http://localhost:3000/api/v1/auth/me
+### Obtener el catálogo de los tipos de documentos
+GET http://localhost:3000/api/v1/document-types
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTllYWExNy1iNGNjLTc1YWYtYmNhYy02ODQ5MzBkNDg5YTEiLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzgxMjM3OTI4LCJleHAiOjE3ODEyNDE1Mjh9.c8Okrb3L4dI_8xYrUmcigRk3zHH_F1c3aHMSCa7YXKI
 
-### Cierre de sesión
-POST http://localhost:3000/api/v1/auth/logout
+### Obtner el catálogo de los estados de los documentos
+GET http://localhost:3000/api/v1/document-statuses
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTllYWExNy1iNGNjLTc1YWYtYmNhYy02ODQ5MzBkNDg5YTEiLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzgxMjM3OTI4LCJleHAiOjE3ODEyNDE1Mjh9.c8Okrb3L4dI_8xYrUmcigRk3zHH_F1c3aHMSCa7YXKI

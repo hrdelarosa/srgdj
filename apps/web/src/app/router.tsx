@@ -4,6 +4,7 @@ import { PrivateRoute } from './routes/PrivateRoute'
 import { HomePage } from './pages/Home'
 import { LoginPage } from './pages/Login'
 import { NotFoundPage } from './pages/NotFoundPage'
+import { DocumentsPage } from './pages/Documents'
 
 export function AppRouter() {
   return (
@@ -21,6 +22,12 @@ export function AppRouter() {
       <Route path="/home">
         <PrivateRoute>
           <HomePage />
+        </PrivateRoute>
+      </Route>
+
+      <Route path="/documents">
+        <PrivateRoute>
+          <DocumentsPage />
         </PrivateRoute>
       </Route>
 

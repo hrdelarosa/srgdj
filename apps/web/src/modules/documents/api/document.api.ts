@@ -1,4 +1,4 @@
-import { httpClient } from '@/shared/api/http-client'
+import { apiClient } from '@/shared/api/api-client'
 import type {
   DocumentListItem,
   FindAllDocumentsParams,
@@ -10,20 +10,26 @@ function buildDocumentsQuery(params?: FindAllDocumentsParams) {
 
   const searchParams = new URLSearchParams()
 
-  if (params.page !== undefined) searchParams.set('page', String(params.page))
-  if (params.pageSize !== undefined)
-    searchParams.set('pageSize', String(params.pageSize))
-  if (params.query) searchParams.set('query', params.query)
-  if (params.statusId) searchParams.set('statusId', params.statusId)
-  if (params.documentTypeId)
-    searchParams.set('documentTypeId', params.documentTypeId)
+  // Mapeo de nombres del frontend a los nombres que espera el backend
+  const { query, statusId, documentTypeId, ...rest } = params
 
-  const query = searchParams.toString()
-  return query ? `?${query}` : ''
+  if (query) searchParams.set('q', query)
+  if (statusId) searchParams.set('currentStatusId', statusId)
+  if (documentTypeId) searchParams.set('documentTypeId', documentTypeId)
+
+  Object.entries(rest).forEach(([key, value]) => {
+    if (value !== undefined && value !== null)
+      searchParams.set(key, String(value))
+  })
+
+  const queryString = searchParams.toString()
+
+  return queryString ? `?${queryString}` : ''
 }
 
 export function getDocuments(params?: FindAllDocumentsParams) {
-  return httpClient<PaginatedResponse<DocumentListItem>>(
+  return apiClient<PaginatedResponse<DocumentListItem>>(
     `/documents${buildDocumentsQuery(params)}`,
   )
 }
+

@@ -4,6 +4,7 @@ import { v7 as uuidv7 } from 'uuid'
 
 import { db } from './db.js'
 import {
+  auditLogs,
   documentEvents,
   documentStatuses,
   documentTypes,
@@ -19,6 +20,7 @@ import {
 async function main() {
   console.log('Limpiando base de datos...')
 
+  await db.delete(auditLogs)
   await db.delete(documentEvents)
   await db.delete(documents)
   await db.delete(userSessions)
@@ -62,6 +64,30 @@ async function main() {
   const permissionsData = [
     { id: uuidv7(), code: 'users:create', name: 'Crear usuarios' },
     { id: uuidv7(), code: 'users:read', name: 'Consultar usuarios' },
+    { id: uuidv7(), code: 'users:update', name: 'Actualizar usuarios' },
+    {
+      id: uuidv7(),
+      code: 'users:deactivate',
+      name: 'Activar/desactivar usuarios',
+    },
+    { id: uuidv7(), code: 'roles:create', name: 'Crear roles' },
+    { id: uuidv7(), code: 'roles:read', name: 'Consultar roles' },
+    { id: uuidv7(), code: 'roles:update', name: 'Actualizar roles' },
+    {
+      id: uuidv7(),
+      code: 'roles:permissions:update',
+      name: 'Asignar permisos a roles',
+    },
+    { id: uuidv7(), code: 'permissions:create', name: 'Crear permisos' },
+    { id: uuidv7(), code: 'permissions:read', name: 'Consultar permisos' },
+    {
+      id: uuidv7(),
+      code: 'permissions:update',
+      name: 'Actualizar permisos',
+    },
+    { id: uuidv7(), code: 'catalogs:create', name: 'Crear catálogos' },
+    { id: uuidv7(), code: 'catalogs:read', name: 'Consultar catálogos' },
+    { id: uuidv7(), code: 'catalogs:update', name: 'Actualizar catálogos' },
     { id: uuidv7(), code: 'documents:create', name: 'Crear documentos' },
     { id: uuidv7(), code: 'documents:read', name: 'Consultar documentos' },
     { id: uuidv7(), code: 'documents:update', name: 'Actualizar documentos' },
@@ -71,8 +97,9 @@ async function main() {
       code: 'documents:events:create',
       name: 'Crear eventos de documentos',
     },
+    { id: uuidv7(), code: 'audit:read', name: 'Consultar auditoría' },
     { id: uuidv7(), code: 'reports:export', name: 'Exportar reportes' },
-  ]
+  ].map((permission) => ({ ...permission, isSystem: true }))
 
   await db.insert(permissions).values(permissionsData)
 
@@ -88,6 +115,7 @@ async function main() {
       .filter(
         (permission) =>
           permission.code.startsWith('documents') ||
+          permission.code === 'catalogs:read' ||
           permission.code === 'reports:export',
       )
       .map((permission) => ({
@@ -99,7 +127,12 @@ async function main() {
   await db.insert(rolePermissions).values(
     permissionsData
       .filter((permission) =>
-        ['documents:create', 'documents:read'].includes(permission.code),
+        [
+          'documents:create',
+          'documents:read',
+          'documents:events:create',
+          'catalogs:read',
+        ].includes(permission.code),
       )
       .map((permission) => ({
         roleId: userRoleId,
@@ -275,6 +308,120 @@ async function main() {
     updatedBy: managerUserId,
   })
 
+  const documentTypeIds = [oficioTypeId, demandaTypeId, acuerdoTypeId]
+  const statusIds = [recibidoStatusId, seguimientoStatusId, concluidoStatusId]
+  const locationIds = [locationOneId, locationTwoId]
+  const creatorIds = [managerUserId, normalUserId]
+  const actors = [
+    'Ana Sofía Martínez',
+    'Luis Fernando Gómez',
+    'Patricia Morales Sánchez',
+    'Roberto Vázquez Núñez',
+    'Elena Torres Aguilar',
+    'Miguel Ángel Ríos',
+    'Verónica Castillo Flores',
+    'Jorge Alberto Medina',
+    'Claudia Herrera Solís',
+    'Héctor Manuel Cruz',
+  ]
+  const defendants = [
+    'Instituto Nacional de Migración',
+    'Oficina de Representación Acapulco',
+    'Área jurídica regional',
+    'Delegación administrativa',
+    'Departamento de control migratorio',
+  ]
+
+  const generatedDocumentIds = Array.from({ length: 100 }, () => uuidv7())
+  const generatedDocuments = generatedDocumentIds.map((id, index) => {
+    const number = index + 4
+    const typeId = documentTypeIds[index % documentTypeIds.length]!
+    const statusId = statusIds[index % statusIds.length]!
+    const creatorId = creatorIds[index % creatorIds.length]!
+    const receivedDate = new Date(2026, 0, 8 + index)
+    const officeDate = new Date(2026, 0, 6 + index)
+
+    return {
+      id,
+      officeNumber: `INM-AJ-${String(number).padStart(3, '0')}/2026`,
+      caseNumber: `EXP-${String(number).padStart(3, '0')}/2026`,
+      actor: actors[index % actors.length]!,
+      defendant: defendants[index % defendants.length]!,
+      documentTypeId: typeId,
+      officeDate,
+      receivedDate,
+      annexes:
+        index % 5 === 0
+          ? 'Sin anexos.'
+          : `Anexos impresos: ${1 + (index % 4)} paquete(s).`,
+      physicalLocationId: locationIds[index % locationIds.length]!,
+      currentStatusId: statusId,
+      observations:
+        index % 3 === 0
+          ? 'Documento generado para probar filtros y paginación.'
+          : 'Registro de prueba para ambiente de desarrollo.',
+      createdBy: creatorId,
+      updatedBy: managerUserId,
+    }
+  })
+
+  await db.insert(documents).values(generatedDocuments)
+
+  const generatedDocumentEvents = generatedDocuments.flatMap((document, index) => {
+    const createdBy = document.createdBy
+    const events: Array<{
+      documentId: string
+      eventType: string
+      fromStatusId: string | null
+      toStatusId: string | null
+      note: string
+      metadata: Record<string, unknown>
+      createdBy: string
+    }> = [
+      {
+        documentId: document.id,
+        eventType: 'CREATED',
+        fromStatusId: null,
+        toStatusId: recibidoStatusId,
+        note: 'Documento registrado en el sistema.',
+        metadata: {},
+        createdBy,
+      },
+    ]
+
+    if (document.currentStatusId !== recibidoStatusId) {
+      events.push({
+        documentId: document.id,
+        eventType: 'STATUS_CHANGED',
+        fromStatusId: recibidoStatusId,
+        toStatusId: document.currentStatusId,
+        note:
+          document.currentStatusId === seguimientoStatusId
+            ? 'Documento marcado en seguimiento.'
+            : 'Documento marcado como concluido.',
+        metadata: {
+          previousStatusId: recibidoStatusId,
+          newStatusId: document.currentStatusId,
+        },
+        createdBy: managerUserId,
+      })
+    }
+
+    if (index % 4 === 0) {
+      events.push({
+        documentId: document.id,
+        eventType: 'NOTE_ADDED',
+        fromStatusId: null,
+        toStatusId: null,
+        note: 'Nota de seguimiento generada como dato de prueba.',
+        metadata: { seed: true },
+        createdBy: managerUserId,
+      })
+    }
+
+    return events
+  })
+
   await db.insert(documentEvents).values([
     {
       documentId: documentOneId,
@@ -318,6 +465,7 @@ async function main() {
       metadata: {},
       createdBy: managerUserId,
     },
+    ...generatedDocumentEvents,
   ])
 
   console.log('Seed completado correctamente.')

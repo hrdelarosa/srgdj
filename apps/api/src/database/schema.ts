@@ -59,6 +59,10 @@ export const roles = mysqlTable('roles', {
   description: varchar('description', { length: 255 }),
   isActive: boolean('is_active').notNull().default(true),
   createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at')
+    .notNull()
+    .defaultNow()
+    .$onUpdateFn(() => new Date()),
 })
 
 export const permissions = mysqlTable('permissions', {
@@ -68,7 +72,13 @@ export const permissions = mysqlTable('permissions', {
   code: varchar('code', { length: 100 }).notNull().unique(),
   name: varchar('name', { length: 150 }).notNull(),
   description: varchar('description', { length: 255 }),
+  isSystem: boolean('is_system').notNull().default(false),
+  isActive: boolean('is_active').notNull().default(true),
   createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at')
+    .notNull()
+    .defaultNow()
+    .$onUpdateFn(() => new Date()),
 })
 
 export const rolePermissions = mysqlTable(
@@ -130,10 +140,15 @@ export const userSessions = mysqlTable(
       .references(() => users.id, { onDelete: 'cascade' }),
 
     tokenHash: varchar('token_hash', { length: 255 }).notNull(),
+    refreshTokenHash: varchar('refresh_token_hash', { length: 255 })
+      .notNull()
+      .unique(),
 
     expiresAt: timestamp('expires_at').notNull(),
     lastActivityAt: timestamp('last_activity_at').notNull(),
+    rotatedAt: timestamp('rotated_at'),
     revokedAt: timestamp('revoked_at'),
+    revokedReason: varchar('revoked_reason', { length: 100 }),
 
     createdAt: timestamp('created_at').notNull().defaultNow(),
     createdByIp: varchar('created_by_ip', { length: 100 }),
@@ -144,6 +159,36 @@ export const userSessions = mysqlTable(
     tokenHashIdx: uniqueIndex('user_sessions_token_hash_idx').on(
       table.tokenHash,
     ),
+    refreshTokenHashIdx: uniqueIndex(
+      'user_sessions_refresh_token_hash_idx',
+    ).on(table.refreshTokenHash),
+  }),
+)
+
+export const auditLogs = mysqlTable(
+  'audit_logs',
+  {
+    id: varchar('id', { length: 36 })
+      .primaryKey()
+      .$defaultFn(() => uuidv7()),
+    actorUserId: varchar('actor_user_id', { length: 36 }).references(
+      () => users.id,
+    ),
+    action: varchar('action', { length: 100 }).notNull(),
+    entityType: varchar('entity_type', { length: 100 }).notNull(),
+    entityId: varchar('entity_id', { length: 36 }),
+    metadata: json('metadata').notNull(),
+    ip: varchar('ip', { length: 100 }),
+    userAgent: varchar('user_agent', { length: 500 }),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+  },
+  (table) => ({
+    actorIdx: index('audit_logs_actor_idx').on(table.actorUserId),
+    entityIdx: index('audit_logs_entity_idx').on(
+      table.entityType,
+      table.entityId,
+    ),
+    actionIdx: index('audit_logs_action_idx').on(table.action),
   }),
 )
 
@@ -320,6 +365,13 @@ export const usersRelations = relations(users, ({ one, many }) => ({
 export const userSessionsRelations = relations(userSessions, ({ one }) => ({
   user: one(users, {
     fields: [userSessions.userId],
+    references: [users.id],
+  }),
+}))
+
+export const auditLogsRelations = relations(auditLogs, ({ one }) => ({
+  actor: one(users, {
+    fields: [auditLogs.actorUserId],
     references: [users.id],
   }),
 }))

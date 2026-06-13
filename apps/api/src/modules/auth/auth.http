@@ -3,14 +3,13 @@ POST http://localhost:3000/api/v1/auth/login
 Content-Type: application/json
   
 {
-  "username": "admin",
+  "username": "jefa.juridico",
   "password": "Admin123*"
 }
 
 ### Obtiene información del usuario autenticado
 GET http://localhost:3000/api/v1/auth/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTllYWExNy1iNGNjLTc1YWYtYmNhYy02ODQ5MzBkNDg5YTEiLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzgxMjM3OTI4LCJleHAiOjE3ODEyNDE1Mjh9.c8Okrb3L4dI_8xYrUmcigRk3zHH_F1c3aHMSCa7YXKI
-
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTllYWExNy1iNGNjLTc1YWYtYmNhYy02ZjIwZjEyNDUxZWYiLCJ1c2VybmFtZSI6ImplZmEuanVyaWRpY28iLCJyb2xlIjoiSkVGRSIsImlhdCI6MTc4MTI5NTc4NSwiZXhwIjoxNzgxMjk5Mzg1fQ.jPLRjUADI0tOLR9pZXLEajpE4uXCTaGp2m0wgTTqY_8
 ### Cierre de sesión
 POST http://localhost:3000/api/v1/auth/logout
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTllYWExNy1iNGNjLTc1YWYtYmNhYy02ODQ5MzBkNDg5YTEiLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzgxMjM3OTI4LCJleHAiOjE3ODEyNDE1Mjh9.c8Okrb3L4dI_8xYrUmcigRk3zHH_F1c3aHMSCa7YXKI
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTllYWExNy1iNGNjLTc1YWYtYmNhYy02ZjIwZjEyNDUxZWYiLCJ1c2VybmFtZSI6ImplZmEuanVyaWRpY28iLCJyb2xlIjoiSkVGRSIsImlhdCI6MTc4MTI5NTc4NSwiZXhwIjoxNzgxMjk5Mzg1fQ.jPLRjUADI0tOLR9pZXLEajpE4uXCTaGp2m0wgTTqY_8

@@ -4,7 +4,11 @@ import { UserModel } from './user.model.js'
 import { requireAuth } from '../../middlewares/require-auth.js'
 import { requirePermission } from '../auth/require-permission.js'
 import { validateRequest } from '../../middlewares/validate-request.js'
-import { createUserSchema, userIdParamsSchema } from './user.schema.js'
+import {
+  createUserSchema,
+  updateUserSchema,
+  userIdParamsSchema,
+} from './user.schema.js'
 
 export const userRoutes = Router()
 const userController = new UserController({
@@ -33,7 +37,7 @@ userRoutes.post(
 userRoutes.put(
   '/:id',
   requirePermission({ permission: 'users:update' }),
-  validateRequest({ params: userIdParamsSchema, body: createUserSchema }),
+  validateRequest({ params: userIdParamsSchema, body: updateUserSchema }),
   userController.update,
 )
 userRoutes.patch(

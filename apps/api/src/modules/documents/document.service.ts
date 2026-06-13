@@ -1,6 +1,5 @@
 import { DocumentModel } from './document.model.js'
 import {
-  FindAllDocumentsParams,
   CreateDocumentModelInput,
   UpdateDocumentModelInput,
 } from '@srgdj/shared'
@@ -54,10 +53,12 @@ export class DocumentService {
   createEvent = async ({
     id,
     data,
+    userId,
   }: {
     id: string
     data: CreateDocumentEventInput
+    userId: string
   }) => {
-    return this.documentModel.createEvent({ id, data })
+    return this.documentModel.createEvent({ id, data, userId })
   }
 }

@@ -16,10 +16,10 @@ import {
 import {
   CreateDocumentModelInput,
   DocumentListItem,
-  FindAllDocumentsParams,
   PaginatedResponse,
   UpdateDocumentModelInput,
 } from '@srgdj/shared'
+import { AppError } from '../../utils/errors/app-error.js'
 import {
   documentEvents,
   documents,
@@ -33,6 +33,7 @@ import { alias } from 'drizzle-orm/mysql-core'
 
 const fromStatus = alias(documentStatuses, 'from_status')
 const toStatus = alias(documentStatuses, 'to_status')
+const eventCreator = alias(users, 'event_creator')
 
 export class DocumentModel {
   static async findAll({
@@ -225,10 +226,16 @@ export class DocumentModel {
           code: toStatus.code,
           name: toStatus.name,
         },
+        createdBy: {
+          id: eventCreator.id,
+          name: eventCreator.username,
+          fullName: eventCreator.fullName,
+        },
       })
       .from(documentEvents)
       .leftJoin(fromStatus, eq(documentEvents.fromStatusId, fromStatus.id))
       .leftJoin(toStatus, eq(documentEvents.toStatusId, toStatus.id))
+      .innerJoin(eventCreator, eq(documentEvents.createdBy, eventCreator.id))
       .where(eq(documentEvents.documentId, id))
       .orderBy(desc(documentEvents.createdAt))
 
@@ -437,10 +444,16 @@ export class DocumentModel {
           code: toStatus.code,
           name: toStatus.name,
         },
+        createdBy: {
+          id: eventCreator.id,
+          name: eventCreator.username,
+          fullName: eventCreator.fullName,
+        },
       })
       .from(documentEvents)
       .leftJoin(fromStatus, eq(documentEvents.fromStatusId, fromStatus.id))
       .leftJoin(toStatus, eq(documentEvents.toStatusId, toStatus.id))
+      .innerJoin(eventCreator, eq(documentEvents.createdBy, eventCreator.id))
       .where(eq(documentEvents.documentId, id))
       .orderBy(desc(documentEvents.createdAt))
   }
@@ -448,9 +461,11 @@ export class DocumentModel {
   static async createEvent({
     id,
     data,
+    userId,
   }: {
     id: string
     data: CreateDocumentEventInput
+    userId: string
   }) {
     const [currentDocument] = await db
       .select({
@@ -467,7 +482,11 @@ export class DocumentModel {
     const createdEvent = await db.transaction(async (tx) => {
       if (data.eventType === 'STATUS_CHANGED') {
         if (!data.toStatusId) {
-          throw new Error('toStatusId is required for STATUS_CHANGED')
+          throw new AppError({
+            message: 'El nuevo estatus es requerido',
+            statusCode: 400,
+            code: 'STATUS_REQUIRED',
+          })
         }
 
         await tx
@@ -475,6 +494,7 @@ export class DocumentModel {
           .set({
             currentStatusId: data.toStatusId,
             updatedAt: new Date(),
+            updatedBy: userId,
           })
           .where(eq(documents.id, id))
       }
@@ -493,7 +513,7 @@ export class DocumentModel {
           data.eventType === 'STATUS_CHANGED' ? data.toStatusId : null,
         note: data.note ?? null,
         metadata: data.metadata ?? {},
-        createdBy: '019eaa17-b4cc-75af-bcac-6f20f12451ef',
+        createdBy: userId,
       })
 
       const [event] = await tx

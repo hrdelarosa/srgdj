@@ -2,6 +2,7 @@ import type { Request, Response } from 'express'
 import { UserModel } from './user.model.js'
 import { UserService } from './user.service.js'
 import { AppError } from '../../utils/errors/app-error.js'
+import { AuditService } from '../audit/audit.service.js'
 
 export class UserController {
   private readonly userService: UserService
@@ -36,7 +37,15 @@ export class UserController {
   create = async (req: Request, res: Response) => {
     const user = await this.userService.create({
       data: req.body,
-      createdByUserId: req.user?.id as string,
+      currentUser: req.user!,
+    })
+    await AuditService.create({
+      data: {
+        actorUserId: req.user?.id,
+        action: 'users.create',
+        entityType: 'user',
+        entityId: user?.id,
+      },
     })
 
     res.status(201).json(user)
@@ -57,6 +66,15 @@ export class UserController {
       })
     }
 
+    await AuditService.create({
+      data: {
+        actorUserId: req.user?.id,
+        action: 'users.update',
+        entityType: 'user',
+        entityId: user.id,
+      },
+    })
+
     res.json(user)
   }
 
@@ -64,6 +82,14 @@ export class UserController {
     const user = await this.userService.setActive({
       id: req.params.id as string,
       isActive: false,
+    })
+    await AuditService.create({
+      data: {
+        actorUserId: req.user?.id,
+        action: 'users.deactivate',
+        entityType: 'user',
+        entityId: req.params.id as string,
+      },
     })
 
     res.json(user)
@@ -73,6 +99,14 @@ export class UserController {
     const user = await this.userService.setActive({
       id: req.params.id as string,
       isActive: true,
+    })
+    await AuditService.create({
+      data: {
+        actorUserId: req.user?.id,
+        action: 'users.activate',
+        entityType: 'user',
+        entityId: req.params.id as string,
+      },
     })
 
     res.json(user)

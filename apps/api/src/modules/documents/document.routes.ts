@@ -5,7 +5,6 @@ import { validateRequest } from '../../middlewares/validate-request.js'
 import {
   createDocumentSchema,
   documentIdParamsSchema,
-  findAllDocumentsQuerySchema,
   updateDocumentSchema,
 } from '@srgdj/shared'
 import {
@@ -69,7 +68,7 @@ documentRoutes.get(
 )
 documentRoutes.post(
   '/:id/events',
-  requirePermission({ permission: 'documents:event:create' }),
+  requirePermission({ permission: 'documents:events:create' }),
   validateRequest({
     params: documentIdParamsSchema,
     body: createDocumentEventSchema,

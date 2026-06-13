@@ -64,6 +64,20 @@ export class UserModel {
     return user ?? null
   }
 
+  static async findRoleById({ roleId }: { roleId: string }) {
+    const [role] = await db
+      .select({
+        id: roles.id,
+        code: roles.code,
+        name: roles.name,
+      })
+      .from(roles)
+      .where(eq(roles.id, roleId))
+      .limit(1)
+
+    return role ?? null
+  }
+
   static async create({ data }: { data: CreateUserData }) {
     const userId = uuidv7()
 

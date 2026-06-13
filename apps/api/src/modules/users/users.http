@@ -8,13 +8,13 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTllYWExN
 
 ### Crea un nuevo usuario
 POST http://localhost:3000/api/v1/users
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTllYWExNy1iNGNjLTc1YWYtYmNhYy02ODQ5MzBkNDg5YTEiLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzgxMTUzNjEyLCJleHAiOjE3ODExNTcyMTJ9.DCZK1zM45_B8ZftQPSRw9hRp6J9LeruADgE5Ybvshso
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTllYWExNy1iNGNjLTc1YWYtYmNhYy02ZjIwZjEyNDUxZWYiLCJ1c2VybmFtZSI6ImplZmEuanVyaWRpY28iLCJyb2xlIjoiSkVGRSIsImlhdCI6MTc4MTI5NTc4NSwiZXhwIjoxNzgxMjk5Mzg1fQ.jPLRjUADI0tOLR9pZXLEajpE4uXCTaGp2m0wgTTqY_8
 Content-Type: application/json
 
 {
-  "username": "capturista.demo",
-  "password": "Demo12345*",
-  "fullName": "Capturista Demo",
-  "roleId": "019eaa17-b4a9-70fb-aa09-14f3b1c0f522",
+  "username": "prueba.user",
+  "password": "Admin123*",
+  "fullName": "Usuario.prueba",
+  "roleId": "019eaa17-b4a7-72aa-abe0-279fe278536d",
   "mustChangePassword": true
 }

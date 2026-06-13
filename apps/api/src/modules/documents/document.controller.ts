@@ -4,6 +4,7 @@ import { AppError } from '../../utils/errors/app-error.js'
 import { DocumentModel } from './document.model.js'
 import { CreateDocumentModelInput } from '@srgdj/shared'
 import { DocumentQuery } from './document.schema.js'
+import { AuditService } from '../audit/audit.service.js'
 
 export class DocumentController {
   private readonly documentService: DocumentService
@@ -70,6 +71,15 @@ export class DocumentController {
       })
     }
 
+    await AuditService.create({
+      data: {
+        actorUserId: userId,
+        action: 'documents.create',
+        entityType: 'document',
+        entityId: document.id,
+      },
+    })
+
     res.status(201).json(document)
   }
 
@@ -98,6 +108,15 @@ export class DocumentController {
       })
     }
 
+    await AuditService.create({
+      data: {
+        actorUserId: userId,
+        action: 'documents.update',
+        entityType: 'document',
+        entityId: document.id,
+      },
+    })
+
     res.json(document)
   }
 
@@ -123,6 +142,15 @@ export class DocumentController {
       })
     }
 
+    await AuditService.create({
+      data: {
+        actorUserId: userId,
+        action: 'documents.delete',
+        entityType: 'document',
+        entityId: id,
+      },
+    })
+
     res.status(204).send()
   }
 
@@ -146,8 +174,40 @@ export class DocumentController {
   }
 
   createEvent = async (req: Request, res: Response) => {
+    const userId = req.user?.id
     const id = req.params.id as string
-    const event = await this.documentService.createEvent({ id, data: req.body })
+
+    if (!userId) {
+      throw new AppError({
+        message: 'Unauthorized',
+        statusCode: 401,
+        code: 'UNAUTHORIZED',
+      })
+    }
+
+    const event = await this.documentService.createEvent({
+      id,
+      data: req.body,
+      userId,
+    })
+
+    if (!event) {
+      throw new AppError({
+        message: 'Document not found',
+        statusCode: 404,
+        code: 'DOCUMENT_NOT_FOUND',
+      })
+    }
+
+    await AuditService.create({
+      data: {
+        actorUserId: userId,
+        action: 'documents.events.create',
+        entityType: 'document',
+        entityId: id,
+        metadata: { eventType: req.body.eventType },
+      },
+    })
 
     res.status(201).json(event)
   }

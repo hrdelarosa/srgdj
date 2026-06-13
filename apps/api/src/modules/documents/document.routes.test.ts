@@ -1,4 +1,5 @@
 import express from 'express'
+import type { NextFunction, Request, Response } from 'express'
 import request from 'supertest'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { errorHandler } from '../../middlewares/error-handler.js'
@@ -6,6 +7,41 @@ import type { DocumentListItem, PaginatedResponse } from '@srgdj/shared'
 
 const findAllMock = vi.fn()
 const findByIdMock = vi.fn()
+const createEventMock = vi.fn()
+
+vi.mock('../../middlewares/require-auth.js', () => ({
+  requireAuth: (req: Request, _res: Response, next: NextFunction) => {
+    req.user = {
+      id: '019e9bc2-a9d6-74c9-adad-9cad76f1d9e1',
+      username: 'admin',
+      role: {
+        id: '019e9bc2-a9d6-74c9-adad-9cad76f1d9e2',
+        code: 'ADMIN',
+        name: 'Administrador',
+      },
+      permissions: [
+        'documents:create',
+        'documents:read',
+        'documents:update',
+        'documents:delete',
+        'documents:events:create',
+      ],
+    }
+    next()
+  },
+}))
+
+vi.mock('../auth/require-permission.js', () => ({
+  requirePermission:
+    () => (_req: Request, _res: Response, next: NextFunction) =>
+      next(),
+}))
+
+vi.mock('../audit/audit.service.js', () => ({
+  AuditService: {
+    create: vi.fn(),
+  },
+}))
 
 vi.mock('./document.model.js', () => ({
   DocumentModel: class {
@@ -15,6 +51,7 @@ vi.mock('./document.model.js', () => ({
     static update = vi.fn()
     static delete = vi.fn()
     static remove = vi.fn()
+    static createEvent = createEventMock
   },
 }))
 
@@ -54,7 +91,7 @@ const sampleDocument: DocumentListItem = {
   createdBy: {
     id: '019e9bc2-a9d6-74c9-adad-9cad76f1d9e1',
     name: 'admin',
-    fullname: 'Administrador',
+    fullName: 'Administrador',
   },
 }
 
@@ -93,9 +130,17 @@ describe('GET /documents', () => {
     expect(findAllMock).toHaveBeenCalledWith({
       page: 1,
       pageSize: 30,
-      query: undefined,
-      statusId: undefined,
+      q: undefined,
+      currentStatusId: undefined,
       documentTypeId: undefined,
+      officeNumber: undefined,
+      caseNumber: undefined,
+      actor: undefined,
+      defendant: undefined,
+      receivedDateFrom: undefined,
+      receivedDateTo: undefined,
+      sortBy: 'createdAt',
+      sortOrder: 'desc',
     })
   })
 
@@ -108,24 +153,40 @@ describe('GET /documents', () => {
     expect(findAllMock).toHaveBeenCalledWith({
       page: 2,
       pageSize: 10,
-      query: undefined,
-      statusId: undefined,
+      q: undefined,
+      currentStatusId: undefined,
       documentTypeId: undefined,
+      officeNumber: undefined,
+      caseNumber: undefined,
+      actor: undefined,
+      defendant: undefined,
+      receivedDateFrom: undefined,
+      receivedDateTo: undefined,
+      sortBy: 'createdAt',
+      sortOrder: 'desc',
     })
   })
 
   it('acepta búsqueda por texto', async () => {
     const app = createTestApp()
 
-    const response = await request(app).get('/documents?query=INM')
+    const response = await request(app).get('/documents?q=INM')
 
     expect(response.status).toBe(200)
     expect(findAllMock).toHaveBeenCalledWith({
       page: 1,
       pageSize: 30,
-      query: 'INM',
-      statusId: undefined,
+      q: 'INM',
+      currentStatusId: undefined,
       documentTypeId: undefined,
+      officeNumber: undefined,
+      caseNumber: undefined,
+      actor: undefined,
+      defendant: undefined,
+      receivedDateFrom: undefined,
+      receivedDateTo: undefined,
+      sortBy: 'createdAt',
+      sortOrder: 'desc',
     })
   })
 
@@ -135,16 +196,24 @@ describe('GET /documents', () => {
     const documentTypeId = '019e9bc2-a9cd-74e0-bcc6-89bd3dd7c001'
 
     const response = await request(app).get(
-      `/documents?statusId=${statusId}&documentTypeId=${documentTypeId}`,
+      `/documents?currentStatusId=${statusId}&documentTypeId=${documentTypeId}`,
     )
 
     expect(response.status).toBe(200)
     expect(findAllMock).toHaveBeenCalledWith({
       page: 1,
       pageSize: 30,
-      query: undefined,
-      statusId,
+      q: undefined,
+      currentStatusId: statusId,
       documentTypeId,
+      officeNumber: undefined,
+      caseNumber: undefined,
+      actor: undefined,
+      defendant: undefined,
+      receivedDateFrom: undefined,
+      receivedDateTo: undefined,
+      sortBy: 'createdAt',
+      sortOrder: 'desc',
     })
   })
 
@@ -172,10 +241,50 @@ describe('GET /documents', () => {
     const app = createTestApp()
     const statusId = 'a'.repeat(37)
 
-    const response = await request(app).get(`/documents?statusId=${statusId}`)
+    const response = await request(app).get(
+      `/documents?currentStatusId=${statusId}`,
+    )
 
     expect(response.status).toBe(400)
     expect(response.body.error.code).toBe('VALIDATION_ERROR')
     expect(findAllMock).not.toHaveBeenCalled()
+  })
+})
+
+describe('POST /documents/:id/events', () => {
+  beforeEach(() => {
+    createEventMock.mockReset()
+    createEventMock.mockResolvedValue({
+      id: '019e9bc2-aa31-7579-8b80-e9ed2450ecb4',
+      documentId: sampleDocument.id,
+      eventType: 'NOTE_ADDED',
+      fromStatusId: null,
+      toStatusId: null,
+      note: 'Seguimiento registrado',
+      metadata: {},
+      createdBy: '019e9bc2-a9d6-74c9-adad-9cad76f1d9e1',
+      createdAt: new Date('2026-06-02'),
+    })
+  })
+
+  it('registra eventos con el usuario autenticado', async () => {
+    const app = createTestApp()
+
+    const response = await request(app)
+      .post(`/documents/${sampleDocument.id}/events`)
+      .send({
+        eventType: 'NOTE_ADDED',
+        note: 'Seguimiento registrado',
+      })
+
+    expect(response.status).toBe(201)
+    expect(createEventMock).toHaveBeenCalledWith({
+      id: sampleDocument.id,
+      data: {
+        eventType: 'NOTE_ADDED',
+        note: 'Seguimiento registrado',
+      },
+      userId: '019e9bc2-a9d6-74c9-adad-9cad76f1d9e1',
+    })
   })
 })

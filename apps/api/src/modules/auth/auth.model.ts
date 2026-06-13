@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm'
+import { and, desc, eq, isNull } from 'drizzle-orm'
 import { db } from '../../database/db.js'
 import {
   permissions,
@@ -79,6 +79,40 @@ export class AuthModel {
     return session ?? null
   }
 
+  static async findValidSessionByRefreshTokenHash({
+    refreshTokenHash,
+  }: {
+    refreshTokenHash: string
+  }) {
+    const [session] = await db.query.userSessions.findMany({
+      where: (userSessions, { eq }) =>
+        eq(userSessions.refreshTokenHash, refreshTokenHash),
+      with: {
+        user: {
+          columns: {
+            id: true,
+            username: true,
+            fullName: true,
+            isActive: true,
+            mustChangePassword: true,
+          },
+          with: {
+            role: {
+              columns: {
+                id: true,
+                code: true,
+                name: true,
+              },
+            },
+          },
+        },
+      },
+      limit: 1,
+    })
+
+    return session ?? null
+  }
+
   static async touchSession({
     sessionId,
     date,
@@ -92,11 +126,59 @@ export class AuthModel {
       .where(eq(userSessions.id, sessionId))
   }
 
-  static async revokeSession({ sessionId }: { sessionId: string }) {
+  static async rotateSession({
+    sessionId,
+    tokenHash,
+    refreshTokenHash,
+    expiresAt,
+    date,
+  }: {
+    sessionId: string
+    tokenHash: string
+    refreshTokenHash: string
+    expiresAt: Date
+    date: Date
+  }) {
     await db
       .update(userSessions)
-      .set({ revokedAt: new Date() })
+      .set({
+        tokenHash,
+        refreshTokenHash,
+        expiresAt,
+        lastActivityAt: date,
+        rotatedAt: date,
+      })
       .where(eq(userSessions.id, sessionId))
+  }
+
+  static async revokeSession({
+    sessionId,
+    reason,
+  }: {
+    sessionId: string
+    reason?: string
+  }) {
+    await db
+      .update(userSessions)
+      .set({ revokedAt: new Date(), revokedReason: reason ?? null })
+      .where(eq(userSessions.id, sessionId))
+  }
+
+  static async findSessionsByUserId({ userId }: { userId: string }) {
+    return db
+      .select({
+        id: userSessions.id,
+        expiresAt: userSessions.expiresAt,
+        lastActivityAt: userSessions.lastActivityAt,
+        revokedAt: userSessions.revokedAt,
+        revokedReason: userSessions.revokedReason,
+        createdAt: userSessions.createdAt,
+        createdByIp: userSessions.createdByIp,
+        userAgent: userSessions.userAgent,
+      })
+      .from(userSessions)
+      .where(eq(userSessions.userId, userId))
+      .orderBy(desc(userSessions.createdAt))
   }
 
   static async findPermissionsByRoleId({ roleId }: { roleId: string }) {
@@ -104,6 +186,8 @@ export class AuthModel {
       .select({ code: permissions.code })
       .from(rolePermissions)
       .innerJoin(permissions, eq(rolePermissions.permissionId, permissions.id))
-      .where(eq(rolePermissions.roleId, roleId))
+      .where(
+        and(eq(rolePermissions.roleId, roleId), eq(permissions.isActive, true)),
+      )
   }
 }

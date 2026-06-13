@@ -2,6 +2,7 @@ import argon2 from 'argon2'
 import { UserModel } from './user.model.js'
 import { CreateUserInput, UpdateUserInput } from './user.schema.js'
 import { AppError } from '../../utils/errors/app-error.js'
+import { AuthUser } from '../auth/auth.type.js'
 
 export class UserService {
   private userModel: typeof UserModel
@@ -20,10 +21,10 @@ export class UserService {
 
   create = async ({
     data,
-    createdByUserId,
+    currentUser,
   }: {
     data: CreateUserInput
-    createdByUserId: string
+    currentUser: AuthUser
   }) => {
     const existingUser = await this.userModel.findByUsername({
       username: data.username,
@@ -37,6 +38,24 @@ export class UserService {
       })
     }
 
+    const role = await this.userModel.findRoleById({ roleId: data.roleId })
+
+    if (!role) {
+      throw new AppError({
+        message: 'El rol no existe',
+        statusCode: 404,
+        code: 'ROLE_NOT_FOUND',
+      })
+    }
+
+    if (currentUser.role.code === 'JEFE_AREA' && role.code !== 'USUARIO') {
+      throw new AppError({
+        message: 'Solo se puedes crear usuarios normales',
+        statusCode: 403,
+        code: 'ROLE_ASSIGNMENT_NOT_ALLOWED',
+      })
+    }
+
     const passwordHash = await argon2.hash(data.password)
 
     return this.userModel.create({
@@ -47,7 +66,7 @@ export class UserService {
         roleId: data.roleId,
         isActive: data.isActive ?? true,
         mustChangePassword: data.mustChangePassword ?? true,
-        createdByUserId,
+        createdByUserId: currentUser.id,
       },
     })
   }

@@ -1,6 +1,7 @@
 export interface CreateSession {
   userId: string
   tokenHash: string
+  refreshTokenHash: string
   expiresAt: Date
   lastActivityAt: Date
   createdByIp?: string | null
@@ -16,4 +17,9 @@ export type AuthUser = {
     name: string
   }
   permissions: string[]
+}
+
+export type AuthMeta = {
+  ip?: string
+  userAgent?: string
 }

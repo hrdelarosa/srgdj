@@ -7,6 +7,14 @@ export async function apiClient<TResponse>(
   endpoint: string,
   options: RequestOptions = {},
 ): Promise<TResponse> {
+  return request<TResponse>(endpoint, options, false)
+}
+
+async function request<TResponse>(
+  endpoint: string,
+  options: RequestOptions,
+  hasRetried: boolean,
+): Promise<TResponse> {
   const token = useAuthStore.getState().accessToken
   const headers = new Headers(options.headers)
 
@@ -21,9 +29,21 @@ export async function apiClient<TResponse>(
   const response = await fetch(`${API_URL}${endpoint}`, {
     ...options,
     headers,
+    credentials: 'include',
   })
 
   if (!response.ok) {
+    if (
+      response.status === 401 &&
+      options.auth !== false &&
+      !hasRetried &&
+      endpoint !== '/auth/refresh'
+    ) {
+      const refreshed = await refreshSession()
+
+      if (refreshed) return request<TResponse>(endpoint, options, true)
+    }
+
     const error = await response.json().catch(() => ({
       message: 'Error inesperado',
     }))
@@ -41,4 +61,27 @@ export async function apiClient<TResponse>(
   if (response.status === 204) return undefined as TResponse
 
   return response.json() as Promise<TResponse>
+}
+
+async function refreshSession() {
+  const response = await fetch(`${API_URL}/auth/refresh`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+
+  if (!response.ok) {
+    useAuthStore.getState().clearSession()
+    return false
+  }
+
+  const data = (await response.json()) as {
+    accessToken: string
+    user: NonNullable<ReturnType<typeof useAuthStore.getState>['user']>
+  }
+
+  useAuthStore.getState().setSession(data)
+  return true
 }

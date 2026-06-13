@@ -8,6 +8,11 @@ import { DocumentsPage } from './pages/Documents'
 import { DocumentDetailPage } from './pages/DocumentDetail'
 import { CreateDocumentPage } from './pages/CreateDocument'
 import { EditDocumentPage } from './pages/EditDocument'
+import { AdminUsersPage } from './pages/AdminUsers'
+import { AdminRolesPage } from './pages/AdminRoles'
+import { AdminPermissionsPage } from './pages/AdminPermissions'
+import { AdminCatalogsPage } from './pages/AdminCatalogs'
+import { AdminAuditPage } from './pages/AdminAudit'
 
 export function AppRouter() {
   return (
@@ -49,6 +54,36 @@ export function AppRouter() {
       <Route path="/documents/:id">
         <PrivateRoute>
           <DocumentDetailPage />
+        </PrivateRoute>
+      </Route>
+
+      <Route path="/admin/users">
+        <PrivateRoute>
+          <AdminUsersPage />
+        </PrivateRoute>
+      </Route>
+
+      <Route path="/admin/roles">
+        <PrivateRoute>
+          <AdminRolesPage />
+        </PrivateRoute>
+      </Route>
+
+      <Route path="/admin/permissions">
+        <PrivateRoute>
+          <AdminPermissionsPage />
+        </PrivateRoute>
+      </Route>
+
+      <Route path="/admin/catalogs">
+        <PrivateRoute>
+          <AdminCatalogsPage />
+        </PrivateRoute>
+      </Route>
+
+      <Route path="/admin/audit">
+        <PrivateRoute>
+          <AdminAuditPage />
         </PrivateRoute>
       </Route>
 

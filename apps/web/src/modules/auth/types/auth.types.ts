@@ -9,6 +9,7 @@ export type AuthUser = {
   username: string
   fullName: string
   role: AuthRole
+  permissions: string[]
   mustChangePassword: boolean
 }
 

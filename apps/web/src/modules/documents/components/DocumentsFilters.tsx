@@ -14,6 +14,7 @@ import {
 import { Label } from '@/shared/components/ui/label'
 import { Link } from 'wouter'
 import { Button } from '@/shared/components/ui/button'
+import { Can } from './Can'
 
 interface Props {
   filters: FindAllDocumentsParams
@@ -98,11 +99,13 @@ export function DocumentsFilters({
       </div>
 
       <div>
-        <Link href="/documents/new">
-          <Button variant="outline" size="sm">
-            Nuevo documento
-          </Button>
-        </Link>
+        <Can permission="documents:create">
+          <Link href="/documents/new">
+            <Button variant="outline" size="sm">
+              Nuevo documento
+            </Button>
+          </Link>
+        </Can>
       </div>
     </div>
   )

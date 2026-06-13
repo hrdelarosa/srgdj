@@ -20,12 +20,11 @@ function getInitialState(): Pick<
   try {
     const parsed = JSON.parse(stored) as {
       user: AuthUser
-      accessToken: string
     }
 
     return {
       user: parsed.user,
-      accessToken: parsed.accessToken,
+      accessToken: null,
       isAuthenticated: true,
     }
   } catch {
@@ -47,7 +46,6 @@ export const useAuthStore = create<AuthState>((set) => ({
       STORAGE_KEY,
       JSON.stringify({
         user,
-        accessToken,
       }),
     )
 

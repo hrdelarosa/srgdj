@@ -3,6 +3,8 @@ import { Link, useRoute } from 'wouter'
 import { Button } from '@/shared/components/ui/button'
 import { formatDate } from '@/shared/lib/formatDate'
 import { useDocument } from '@/modules/documents/hooks/useDocument'
+import { AddDocumentEventForm } from '@/modules/documents/components/AddDocumentEventForm'
+import { Can } from '@/modules/documents/components/Can'
 
 export function DocumentDetailPage() {
   const [, params] = useRoute('/documents/:id')
@@ -67,6 +69,13 @@ export function DocumentDetailPage() {
         <p>{document.observations ?? 'Sin observaciones'}</p>
       </div>
 
+      <Can permission="documents:events:create">
+        <AddDocumentEventForm
+          documentId={documentId}
+          currentStatusId={document.currentStatus.id}
+        />
+      </Can>
+
       <div className="rounded-md border p-4">
         <h2 className="mb-4 text-lg font-semibold">Bitácora</h2>
 
@@ -84,6 +93,10 @@ export function DocumentDetailPage() {
                 </div>
 
                 {event.note && <p className="mt-2">{event.note}</p>}
+
+                <p className="text-muted-foreground mt-2 text-xs">
+                  Registrado por {event.createdBy?.fullName ?? 'Usuario'}
+                </p>
 
                 {(event.fromStatus?.name || event.toStatus?.name) && (
                   <p className="text-muted-foreground mt-2 text-sm">

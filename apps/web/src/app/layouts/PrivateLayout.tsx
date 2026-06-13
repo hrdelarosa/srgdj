@@ -3,6 +3,7 @@ import { Link } from 'wouter'
 
 import { useLogout } from '@/modules/auth/hooks/useLogout'
 import { useAuthStore } from '@/modules/auth/store/auth.store'
+import { Can } from '@/modules/documents/components/Can'
 import { Button } from '@/shared/components/ui/button'
 
 type PrivateLayoutProps = {
@@ -22,6 +23,40 @@ export function PrivateLayout({ children }: PrivateLayoutProps) {
           <Link href="/home">
             <Button variant="link">Home</Button>
           </Link>
+
+          <Link href="/documents">
+            <Button variant="link">Documentos</Button>
+          </Link>
+
+          <Can permission="users:read">
+            <Link href="/admin/users">
+              <Button variant="link">Usuarios</Button>
+            </Link>
+          </Can>
+
+          <Can permission="roles:read">
+            <Link href="/admin/roles">
+              <Button variant="link">Roles</Button>
+            </Link>
+          </Can>
+
+          <Can permission="permissions:read">
+            <Link href="/admin/permissions">
+              <Button variant="link">Permisos</Button>
+            </Link>
+          </Can>
+
+          <Can permission="catalogs:read">
+            <Link href="/admin/catalogs">
+              <Button variant="link">Catálogos</Button>
+            </Link>
+          </Can>
+
+          <Can permission="audit:read">
+            <Link href="/admin/audit">
+              <Button variant="link">Auditoría</Button>
+            </Link>
+          </Can>
         </nav>
       </aside>
 

@@ -6,7 +6,10 @@ import type {
   PaginatedResponse,
   UpdateDocumentInput,
 } from '@srgdj/shared'
-import type { DocumentDetail } from '../types/document.types'
+import type {
+  CreateDocumentEventInput,
+  DocumentDetail,
+} from '../types/document.types'
 
 function buildDocumentsQuery(params?: FindAllDocumentsParams) {
   if (!params) return ''
@@ -62,5 +65,18 @@ export function updateDocument({
 export function deleteDocument({ id }: { id: string }) {
   return apiClient<void>(`/documents/delete/${id}`, {
     method: 'PATCH',
+  })
+}
+
+export function createDocumentEvent({
+  documentId,
+  data,
+}: {
+  documentId: string
+  data: CreateDocumentEventInput
+}) {
+  return apiClient(`/documents/${documentId}/events`, {
+    method: 'POST',
+    body: JSON.stringify(data),
   })
 }

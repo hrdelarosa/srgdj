@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu'
 import { useDeleteDocument } from '../hooks/useDeleteDocument'
+import { Can } from './Can'
 
 interface Props {
   documentId: string
@@ -34,41 +35,47 @@ export function DocumentActions({ documentId }: Props) {
         <DropdownMenuLabel>Acciones</DropdownMenuLabel>
 
         <DropdownMenuGroup>
-          <DropdownMenuItem
-            onClick={() => setLocation(`/documents/${documentId}`)}
-          >
-            <Eye />
-            Detalles
-          </DropdownMenuItem>
+          <Can permission="documents:read">
+            <DropdownMenuItem
+              onClick={() => setLocation(`/documents/${documentId}`)}
+            >
+              <Eye />
+              Detalles
+            </DropdownMenuItem>
+          </Can>
 
-          <DropdownMenuItem
-            onClick={() => setLocation(`/documents/${documentId}/edit`)}
-          >
-            <PencilLine />
-            Editar
-          </DropdownMenuItem>
+          <Can permission="documents:update">
+            <DropdownMenuItem
+              onClick={() => setLocation(`/documents/${documentId}/edit`)}
+            >
+              <PencilLine />
+              Editar
+            </DropdownMenuItem>
+          </Can>
         </DropdownMenuGroup>
 
-        <DropdownMenuSeparator />
+        <Can permission="documents:delete">
+          <DropdownMenuSeparator />
 
-        <DropdownMenuGroup>
-          <DropdownMenuItem
-            variant="destructive"
-            disabled={deleteMutation.isPending}
-            onClick={() => {
-              const confirmed = window.confirm(
-                '¿Seguro que deseas eliminar este documento? Esta acción lo ocultará del listado, pero no lo borrará definitivamente.',
-              )
+          <DropdownMenuGroup>
+            <DropdownMenuItem
+              variant="destructive"
+              disabled={deleteMutation.isPending}
+              onClick={() => {
+                const confirmed = window.confirm(
+                  '¿Seguro que deseas eliminar este documento? Esta acción lo ocultará del listado, pero no lo borrará definitivamente.',
+                )
 
-              if (!confirmed) return
+                if (!confirmed) return
 
-              deleteMutation.mutate({ id: documentId })
-            }}
-          >
-            <Trash />
-            Eliminar
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
+                deleteMutation.mutate({ id: documentId })
+              }}
+            >
+              <Trash />
+              Eliminar
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+        </Can>
       </DropdownMenuContent>
     </DropdownMenu>
   )

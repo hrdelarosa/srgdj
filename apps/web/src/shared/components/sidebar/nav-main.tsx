@@ -24,7 +24,7 @@ export default function NavMain() {
                   asChild
                   isActive={isActive(route.href)}
                   tooltip={route.label}
-                  className="hover:bg-sidebar-hover hover:text-sidebar-foreground data-active:hover:bg-sidebar-accent data-active:hover:text-black"
+                  className="hover:bg-sidebar-hover hover:text-sidebar-foreground data-active:bg-white data-active:hover:bg-sidebar-accent data-active:hover:text-black"
                 >
                   <Link href={route.href}>
                     {route.icon && <route.icon />}

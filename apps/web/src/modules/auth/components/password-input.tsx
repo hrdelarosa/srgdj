@@ -25,7 +25,7 @@ export default function PasswordInput({
   const [showPassword, setShowPassword] = useState(false)
 
   return (
-    <Field>
+    <Field className="gap-1.5">
       {label && <FieldLabel htmlFor={props.id}>{label}</FieldLabel>}
       {children}
 
@@ -47,7 +47,7 @@ export default function PasswordInput({
         </InputGroupAddon>
       </InputGroup>
 
-      <FieldError>{error}</FieldError>
+      <FieldError className="text-destructive-active">{error}</FieldError>
     </Field>
   )
 }

@@ -29,10 +29,10 @@ export default function FormLogin() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <FieldGroup>
+      <FieldGroup className="gap-7">
         <Field>
-          <FieldGroup className="gap-5">
-            <Field>
+          <FieldGroup className="gap-3.5">
+            <Field className="gap-1.5">
               <FieldLabel htmlFor="user">Usuario</FieldLabel>
               <Input
                 {...register('username')}
@@ -40,8 +40,11 @@ export default function FormLogin() {
                 type="text"
                 autoComplete="username"
                 autoFocus
+                aria-invalid={!!errors.username}
               />
-              <FieldError>{errors.username?.message}</FieldError>
+              <FieldError className="text-destructive-active">
+                {errors.username?.message}
+              </FieldError>
             </Field>
 
             <PasswordInput
@@ -55,7 +58,12 @@ export default function FormLogin() {
         </Field>
 
         <Field>
-          <Button type="submit" size="lg" disabled={loginMutation.isPending}>
+          <Button
+            type="submit"
+            size="lg"
+            disabled={loginMutation.isPending}
+            className="hover:bg-primary-hover"
+          >
             {loginMutation.isPending ? <Spinner /> : 'Iniciar sesión'}
           </Button>
         </Field>

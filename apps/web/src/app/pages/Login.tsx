@@ -16,7 +16,7 @@ export function LoginPage() {
         </CardTitle>
 
         <CardDescription>
-          Inicia sesión con su nombre de usuario y contraseña
+          Inicie sesión con su nombre de usuario y contraseña
         </CardDescription>
       </CardHeader>
 

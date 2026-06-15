@@ -1,5 +1,6 @@
 import { Separator } from '../ui/separator'
 import { SidebarTrigger } from '../ui/sidebar'
+import SiteUser from './site-user'
 
 export default function SiteHeader() {
   return (
@@ -13,6 +14,8 @@ export default function SiteHeader() {
         <h1 className="text-lg font-semibold tracking-tight">
           Sistema de Control de Documentos Jurídicos
         </h1>
+
+        <SiteUser />
       </div>
     </header>
   )

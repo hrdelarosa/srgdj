@@ -155,16 +155,15 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: #611232;
   /* --primary: oklch(0.205 0 0); */
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
+  /* --secondary: oklch(0.97 0 0); */
   --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
+  /* --muted: oklch(0.97 0 0); */
   --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
+  /* --accent: oklch(0.97 0 0); */
   --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
+  /* --destructive: oklch(0.577 0.245 27.325); */
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
@@ -174,14 +173,111 @@
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
+  /* --sidebar: oklch(0.985 0 0); */
+  /* --sidebar-foreground: oklch(0.145 0 0); */
   --sidebar-primary: oklch(0.205 0 0);
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent: oklch(0.97 0 0);
   --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
+  /* --sidebar-border: oklch(0.922 0 0); */
   --sidebar-ring: oklch(0.708 0 0);
+  /* ==========================================
+   * LAYOUT
+   * ========================================== */
+  /* --background: #fafafa;
+  --foreground: #1f2937;
+
+  --card: #ffffff;
+  --card-foreground: #1f2937;
+
+  --popover: #ffffff;
+  --popover-foreground: #1f2937; */
+
+  --border: #e5e7eb;
+  --input: #e5e7eb;
+  --ring: #611232;
+
+  /* ==========================================
+   * PRIMARY (Guinda Institucional)
+   * ========================================== */
+  --primary: #611232;
+  --primary-hover: #4a0d26;
+  --primary-active: #3a081d;
+  /* --primary-foreground: #ffffff; */
+
+  /* ==========================================
+   * SECONDARY (Dorado Institucional)
+   * ========================================== */
+  --secondary: #bc955c;
+  --secondary-hover: #a8844f;
+  --secondary-active: #8d6e40;
+  /* --secondary-foreground: #ffffff; */
+
+  /* ==========================================
+   * ACCENT (Verde Operativo)
+   * ========================================== */
+  --accent: #2e6b5a;
+  --accent-hover: #245648;
+  --accent-active: #1d463b;
+  /* --accent-foreground: #ffffff; */
+
+  /* ==========================================
+   * MUTED
+   * ========================================== */
+  --muted: #f8fafc;
+  /* --muted-foreground: #6b7280; */
+
+  /* ==========================================
+   * SIDEBAR
+   * ========================================== */
+  --sidebar: #611232;
+
+  --sidebar-foreground: #fdf2f8;
+
+  --sidebar-hover: #7a1a42;
+  --sidebar-hover-foreground: #ffffff;
+
+  --sidebar-active: #ffffff;
+  --sidebar-active-foreground: #611232;
+
+  --sidebar-border: #7a1a42;
+
+  --sidebar-icon: #f3d6e2;
+  --sidebar-icon-active: #611232;
+
+  --sidebar-group-label: #d8b4c2;
+
+  /* ==========================================
+   * SUCCESS
+   * ========================================== */
+  --success: #16a34a;
+  --success-hover: #15803d;
+  --success-active: #166534;
+  --success-foreground: #ffffff;
+
+  /* ==========================================
+   * WARNING
+   * ========================================== */
+  --warning: #f59e0b;
+  --warning-hover: #d97706;
+  --warning-active: #b45309;
+  --warning-foreground: #ffffff;
+
+  /* ==========================================
+   * DESTRUCTIVE
+   * ========================================== */
+  --destructive: #dc2626;
+  --destructive-hover: #b91c1c;
+  --destructive-active: #991b1b;
+  --destructive-foreground: #ffffff;
+
+  /* ==========================================
+   * INFO
+   * ========================================== */
+  --info: #2563eb;
+  --info-hover: #1d4ed8;
+  --info-active: #1e40af;
+  --info-foreground: #ffffff;
 }
 
 .dark {

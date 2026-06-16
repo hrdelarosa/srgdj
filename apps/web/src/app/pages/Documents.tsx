@@ -9,6 +9,10 @@ import {
   useDocumentStatuses,
   useDocumentTypes,
 } from '@/modules/documents/hooks/useDocumentCatalogs'
+import { Button } from '@/shared/components/ui/button'
+import { FilePlus2Icon } from 'lucide-react'
+import { Can } from '@/modules/documents/components/Can'
+import { Link } from 'wouter'
 
 export function DocumentsPage() {
   const { filters, inputQuery, updateFilter, setDebouncedQuery, setPage } =
@@ -34,23 +38,44 @@ export function DocumentsPage() {
   if (!documentsQuery.data) return null
 
   return (
-    <section className="mt-6">
-      <DocumentsFilters
-        filters={{ ...filters, query: inputQuery }}
-        statuses={statusesQuery.data?.items ?? []}
-        types={typesQuery.data?.items ?? []}
-        onChange={updateFilter}
-      />
+    <>
+      <div className="mb-2 flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold">Listado de los Documentos</h2>
+          <p className="text-sm text-muted-foreground">
+            Aquí puedes gestionar tus documentos, filtrarlos por tipo o estado,
+            y navegar entre las páginas de resultados.
+          </p>
+        </div>
 
-      <DocumentsTable documents={documentsQuery.data.items} />
+        <Can permission="documents:create">
+          <Link href="/documents/new">
+            <Button className="hover:bg-primary-hover" size="lg">
+              <FilePlus2Icon />
+              Nuevo Documento
+            </Button>
+          </Link>
+        </Can>
+      </div>
 
-      <DocumentsPagination
-        page={documentsQuery.data.page}
-        pageSize={documentsQuery.data.pageSize}
-        totalItems={documentsQuery.data.total}
-        totalPages={documentsQuery.data.totalPages}
-        onPageChange={setPage}
-      />
-    </section>
+      <section>
+        <DocumentsFilters
+          filters={{ ...filters, query: inputQuery }}
+          statuses={statusesQuery.data?.items ?? []}
+          types={typesQuery.data?.items ?? []}
+          onChange={updateFilter}
+        />
+
+        <DocumentsTable documents={documentsQuery.data.items} />
+
+        <DocumentsPagination
+          page={documentsQuery.data.page}
+          pageSize={documentsQuery.data.pageSize}
+          totalItems={documentsQuery.data.total}
+          totalPages={documentsQuery.data.totalPages}
+          onPageChange={setPage}
+        />
+      </section>
+    </>
   )
 }

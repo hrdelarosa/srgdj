@@ -1,4 +1,5 @@
 import { SearchIcon } from 'lucide-react'
+
 import type { FindAllDocumentsParams } from '@srgdj/shared'
 import type {
   DocumentStatusOption,
@@ -11,10 +12,14 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from '@/shared/components/ui/input-group'
-import { Label } from '@/shared/components/ui/label'
-import { Link } from 'wouter'
-import { Button } from '@/shared/components/ui/button'
-import { Can } from './Can'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/shared/components/ui/select'
 
 interface Props {
   filters: FindAllDocumentsParams
@@ -33,79 +38,74 @@ export function DocumentsFilters({
   onChange,
 }: Props) {
   return (
-    <div className="flex items-center justify-between">
-      <div className="mb-4 flex flex-wrap gap-4">
-        <Field className="max-w-sm min-w-50 flex-1">
-          <FieldLabel>Buscar documentos</FieldLabel>
+    <div className="flex items-center justify-between mb-5">
+      <Field>
+        <FieldLabel>Buscar documentos</FieldLabel>
 
-          <InputGroup>
-            <InputGroupInput
-              placeholder="Oficio, expediente, actor o demandado..."
-              value={filters.query ?? ''}
-              onChange={(event) => onChange('query', event.target.value)}
-            />
+        <InputGroup className="max-w-sm">
+          <InputGroupInput
+            placeholder="Oficio, expediente, actor o demandado..."
+            value={filters.query ?? ''}
+            onChange={(event) => onChange('query', event.target.value)}
+          />
+          <InputGroupAddon align="inline-start">
+            <SearchIcon />
+          </InputGroupAddon>
+        </InputGroup>
+      </Field>
 
-            <InputGroupAddon align="inline-start">
-              <SearchIcon className="text-muted-foreground" />
-            </InputGroupAddon>
-          </InputGroup>
+      <div className="flex gap-4">
+        <Field className="w-44">
+          <FieldLabel htmlFor="status-filter">Estatus</FieldLabel>
+
+          <Select
+            value={filters.statusId ?? ' '}
+            onValueChange={(event) =>
+              onChange('statusId', event === ' ' ? undefined : event)
+            }
+          >
+            <SelectTrigger className="w-full" id="status-filter">
+              <SelectValue />
+            </SelectTrigger>
+
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value=" ">Todos</SelectItem>
+                {statuses.map((status) => (
+                  <SelectItem key={status.id} value={status.id}>
+                    {status.name}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </Field>
 
-        <div className="min-w-40">
-          <Label htmlFor="status-filter" className="mb-2 block">
-            Estatus
-          </Label>
+        <Field className="w-44">
+          <FieldLabel>Tipo</FieldLabel>
 
-          <select
-            id="status-filter"
-            className="border-input bg-background h-9 w-full rounded-md border px-3 text-sm"
-            value={filters.statusId ?? ''}
-            onChange={(event) =>
-              onChange('statusId', event.target.value || undefined)
+          <Select
+            value={filters.documentTypeId ?? ' '}
+            onValueChange={(event) =>
+              onChange('documentTypeId', event === ' ' ? undefined : event)
             }
           >
-            <option value="">Todos</option>
+            <SelectTrigger className="w-full">
+              <SelectValue />
+            </SelectTrigger>
 
-            {statuses.map((status) => (
-              <option key={status.id} value={status.id}>
-                {status.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="min-w-40">
-          <Label htmlFor="type-filter" className="mb-2 block">
-            Tipo
-          </Label>
-
-          <select
-            id="type-filter"
-            className="border-input bg-background h-9 w-full rounded-md border px-3 text-sm"
-            value={filters.documentTypeId ?? ''}
-            onChange={(event) =>
-              onChange('documentTypeId', event.target.value || undefined)
-            }
-          >
-            <option value="">Todos</option>
-
-            {types.map((type) => (
-              <option key={type.id} value={type.id}>
-                {type.name}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      <div>
-        <Can permission="documents:create">
-          <Link href="/documents/new">
-            <Button variant="outline" size="sm">
-              Nuevo documento
-            </Button>
-          </Link>
-        </Can>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value=" ">Todos</SelectItem>
+                {types.map((type) => (
+                  <SelectItem key={type.id} value={type.id}>
+                    {type.name}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </Field>
       </div>
     </div>
   )

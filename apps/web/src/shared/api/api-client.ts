@@ -2,6 +2,7 @@ import { useAuthStore } from '@/modules/auth/store/auth.store'
 import type { RequestOptions } from '../types/auth.type'
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api/v1'
+let refreshPromise: Promise<boolean> | null = null
 
 export async function apiClient<TResponse>(
   endpoint: string,
@@ -63,7 +64,17 @@ async function request<TResponse>(
   return response.json() as Promise<TResponse>
 }
 
-async function refreshSession() {
+export async function refreshSession() {
+  if (!refreshPromise) {
+    refreshPromise = doRefreshSession().finally(() => {
+      refreshPromise = null
+    })
+  }
+
+  return refreshPromise
+}
+
+async function doRefreshSession() {
   const response = await fetch(`${API_URL}/auth/refresh`, {
     method: 'POST',
     credentials: 'include',

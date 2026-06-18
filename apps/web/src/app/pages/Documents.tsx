@@ -1,31 +1,16 @@
-import { useEffect } from 'react'
-import { DocumentsFilters } from '@/modules/documents/components/DocumentsFilters'
-import { DocumentsPagination } from '@/modules/documents/components/DocumentsPagination'
-import { DocumentsTable } from '@/modules/documents/components/DocumentsTable'
-import { useDocumentFilters } from '@/modules/documents/hooks/useDocumentFilters'
-import { useDocuments } from '@/modules/documents/hooks/useDocuments'
-import { useDebounced } from '@/shared/hooks/useDebounced'
-import {
-  useDocumentStatuses,
-  useDocumentTypes,
-} from '@/modules/documents/hooks/useDocumentCatalogs'
-import { Button } from '@/shared/components/ui/button'
-import { FilePlus2Icon } from 'lucide-react'
-import { Can } from '@/modules/documents/components/Can'
 import { Link } from 'wouter'
+import { FilePlus2Icon } from 'lucide-react'
+
+import { Can } from '@/modules/documents/components/Can'
+import { Button } from '@/shared/components/ui/button'
+import { DocumentsFilters } from '@/modules/documents/components/DocumentsFilters'
+import { DocumentsTable } from '@/modules/documents/components/DocumentsTable'
+import { DocumentsPagination } from '@/modules/documents/components/DocumentsPagination'
+import useDocumentsPage from '@/modules/documents/hooks/useDocumentsPage'
 
 export function DocumentsPage() {
-  const { filters, inputQuery, updateFilter, setDebouncedQuery, setPage } =
-    useDocumentFilters()
-  const debouncedQuery = useDebounced(inputQuery, 400)
-  const typesQuery = useDocumentTypes()
-  const statusesQuery = useDocumentStatuses()
-
-  useEffect(() => {
-    setDebouncedQuery(debouncedQuery)
-  }, [debouncedQuery, setDebouncedQuery])
-
-  const documentsQuery = useDocuments({ ...filters, query: debouncedQuery })
+  const { filters, inputQuery, updateFilter, setPage, documentsQuery } =
+    useDocumentsPage()
 
   if (documentsQuery.isLoading && !documentsQuery.isPlaceholderData) {
     return <p className="p-6">Cargando documentos...</p>
@@ -49,10 +34,10 @@ export function DocumentsPage() {
         </div>
 
         <Can permission="documents:create">
-          <Link href="/documents/new">
-            <Button className="hover:bg-primary-hover" size="lg">
+          <Link to="/documents/create">
+            <Button size="lg">
               <FilePlus2Icon />
-              Nuevo Documento
+              Crear documento
             </Button>
           </Link>
         </Can>
@@ -61,8 +46,6 @@ export function DocumentsPage() {
       <section>
         <DocumentsFilters
           filters={{ ...filters, query: inputQuery }}
-          statuses={statusesQuery.data?.items ?? []}
-          types={typesQuery.data?.items ?? []}
           onChange={updateFilter}
         />
 

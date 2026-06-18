@@ -1,10 +1,6 @@
 import { SearchIcon } from 'lucide-react'
 
 import type { FindAllDocumentsParams } from '@srgdj/shared'
-import type {
-  DocumentStatusOption,
-  DocumentTypeOption,
-} from '../types/document-catalog.types'
 
 import { Field, FieldLabel } from '@/shared/components/ui/field'
 import {
@@ -20,30 +16,31 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/components/ui/select'
+import {
+  useDocumentStatuses,
+  useDocumentTypes,
+} from '../hooks/useDocumentCatalogs'
 
 interface Props {
   filters: FindAllDocumentsParams
-  statuses: DocumentStatusOption[]
-  types: DocumentTypeOption[]
   onChange: <K extends keyof FindAllDocumentsParams>(
     key: K,
     value: FindAllDocumentsParams[K],
   ) => void
 }
 
-export function DocumentsFilters({
-  filters,
-  statuses,
-  types,
-  onChange,
-}: Props) {
+export function DocumentsFilters({ filters, onChange }: Props) {
+  const types = useDocumentTypes()
+  const statuses = useDocumentStatuses()
+
   return (
     <div className="flex items-center justify-between mb-5">
       <Field>
-        <FieldLabel>Buscar documentos</FieldLabel>
+        <FieldLabel htmlFor="search-filter">Buscar documentos</FieldLabel>
 
         <InputGroup className="max-w-sm">
           <InputGroupInput
+            id="search-filter"
             placeholder="Oficio, expediente, actor o demandado..."
             value={filters.query ?? ''}
             onChange={(event) => onChange('query', event.target.value)}
@@ -71,7 +68,7 @@ export function DocumentsFilters({
             <SelectContent>
               <SelectGroup>
                 <SelectItem value=" ">Todos</SelectItem>
-                {statuses.map((status) => (
+                {statuses.data?.items.map((status) => (
                   <SelectItem key={status.id} value={status.id}>
                     {status.name}
                   </SelectItem>
@@ -82,7 +79,7 @@ export function DocumentsFilters({
         </Field>
 
         <Field className="w-44">
-          <FieldLabel>Tipo</FieldLabel>
+          <FieldLabel htmlFor="type-filter">Tipo</FieldLabel>
 
           <Select
             value={filters.documentTypeId ?? ' '}
@@ -90,14 +87,14 @@ export function DocumentsFilters({
               onChange('documentTypeId', event === ' ' ? undefined : event)
             }
           >
-            <SelectTrigger className="w-full">
+            <SelectTrigger className="w-full" id="type-filter">
               <SelectValue />
             </SelectTrigger>
 
             <SelectContent>
               <SelectGroup>
                 <SelectItem value=" ">Todos</SelectItem>
-                {types.map((type) => (
+                {types.data?.items.map((type) => (
                   <SelectItem key={type.id} value={type.id}>
                     {type.name}
                   </SelectItem>

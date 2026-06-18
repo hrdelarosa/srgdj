@@ -1,6 +1,13 @@
-import { ChevronLeft, ChevronRight } from 'lucide-react'
-
-import { Button } from '@/shared/components/ui/button'
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/shared/components/ui/pagination'
+import { getPaginationRange } from '@/shared/lib/getPaginationRange'
 
 type DocumentsPaginationProps = {
   page: number
@@ -19,6 +26,14 @@ export function DocumentsPagination({
 }: DocumentsPaginationProps) {
   const startItem = totalItems === 0 ? 0 : (page - 1) * pageSize + 1
   const endItem = Math.min(page * pageSize, totalItems)
+  const safeTotalPages = totalPages || 1
+  const range = getPaginationRange({
+    page,
+    totalPages: safeTotalPages,
+  })
+
+  const isFirstPage = page <= 1
+  const isLastPage = page >= safeTotalPages
 
   return (
     <div className="mt-7 flex w-full items-end justify-between">
@@ -26,27 +41,58 @@ export function DocumentsPagination({
         Resultados: {startItem}-{endItem} de {totalItems}
       </span>
 
-      <div className="flex items-center justify-center gap-1">
-        <Button
-          onClick={() => onPageChange(page - 1)}
-          disabled={page <= 1}
-          className="hover:bg-gray-200"
-        >
-          <ChevronLeft className="size-4" />
-        </Button>
+      <Pagination className="mx-0 w-auto">
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious
+              href="#"
+              onClick={(e) => {
+                e.preventDefault()
+                if (!isFirstPage) onPageChange(page - 1)
+              }}
+              aria-disabled={isFirstPage}
+              className={
+                isFirstPage ? 'pointer-events-none opacity-50' : undefined
+              }
+            />
+          </PaginationItem>
 
-        <span className="px-3 text-sm">
-          Página {page} de {totalPages || 1}
-        </span>
+          {range.map((item, index) =>
+            item === 'ellipsis' ? (
+              <PaginationItem key={`ellipsis-${index}`}>
+                <PaginationEllipsis />
+              </PaginationItem>
+            ) : (
+              <PaginationItem key={item} className="">
+                <PaginationLink
+                  href="#"
+                  isActive={item === page}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    onPageChange(item)
+                  }}
+                >
+                  {item}
+                </PaginationLink>
+              </PaginationItem>
+            ),
+          )}
 
-        <Button
-          onClick={() => onPageChange(page + 1)}
-          disabled={page >= totalPages}
-          className="hover:bg-gray-200"
-        >
-          <ChevronRight className="size-4" />
-        </Button>
-      </div>
+          <PaginationItem>
+            <PaginationNext
+              href="#"
+              onClick={(e) => {
+                e.preventDefault()
+                if (!isLastPage) onPageChange(page + 1)
+              }}
+              aria-disabled={isLastPage}
+              className={
+                isLastPage ? 'pointer-events-none opacity-50' : undefined
+              }
+            />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
     </div>
   )
 }

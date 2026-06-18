@@ -10,11 +10,11 @@ export interface FindAllDocumentsParams extends PaginationParams {
   documentTypeId?: string
 }
 
-export interface CreateDocumentModelInput extends CreateDocumentInput {
+export type CreateDocumentModelInput = CreateDocumentInput & {
   userId: string
 }
 
-export interface UpdateDocumentModelInput extends UpdateDocumentInput {
+export type UpdateDocumentModelInput = UpdateDocumentInput & {
   id: string
   userId: string
 }

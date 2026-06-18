@@ -39,7 +39,7 @@ export function AppRouter() {
         </PrivateRoute>
       </Route>
 
-      <Route path="/documents/new">
+      <Route path="/documents/create">
         <PrivateRoute>
           <CreateDocumentPage />
         </PrivateRoute>

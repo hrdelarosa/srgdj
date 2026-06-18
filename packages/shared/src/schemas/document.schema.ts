@@ -76,6 +76,7 @@ export const findAllDocumentsQuerySchema = z.object({
   documentTypeId: optionalIdSchema,
 })
 
+export type CreateDocumentFormTypes = z.infer<typeof createDocumentSchema>
 export type CreateDocumentFormInput = z.input<typeof createDocumentSchema>
 export type CreateDocumentInput = z.output<typeof createDocumentSchema>
 // export type CreateDocumentInput = z.infer<typeof createDocumentSchema>

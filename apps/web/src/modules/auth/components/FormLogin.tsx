@@ -1,34 +1,27 @@
-import { zodResolver } from '@hookform/resolvers/zod'
+import { loginFormSchema } from '../schema/login.schema'
+
+import { Input } from '@/shared/components/ui/input'
+import { Button } from '@/shared/components/ui/button'
+import { Spinner } from '@/shared/components/ui/spinner'
+import PasswordInput from './password-input'
 import {
   Field,
   FieldError,
   FieldGroup,
   FieldLabel,
 } from '@/shared/components/ui/field'
-import { Input } from '@/shared/components/ui/input'
-import { Button } from '@/shared/components/ui/button'
 import { useLogin } from '../hooks/useLogin'
-import { useForm, type SubmitHandler } from 'react-hook-form'
-import { type LoginFormInput, loginFormSchema } from '../schema/login.schema'
-import PasswordInput from './password-input'
-import { Spinner } from '@/shared/components/ui/spinner'
+import { useValidatedForm } from '@/shared/hooks/useValidatedForm'
 
 export default function FormLogin() {
   const loginMutation = useLogin()
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<LoginFormInput>({
-    resolver: zodResolver(loginFormSchema),
+  const { register, handleSubmit, errors } = useValidatedForm({
+    formSchema: loginFormSchema,
+    onSubmit: (data) => loginMutation.mutate({ data }),
   })
 
-  const onSubmit: SubmitHandler<LoginFormInput> = (data: LoginFormInput) => {
-    loginMutation.mutate({ data })
-  }
-
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit}>
       <FieldGroup className="gap-7">
         <Field>
           <FieldGroup className="gap-3.5">

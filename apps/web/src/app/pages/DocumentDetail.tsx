@@ -1,10 +1,28 @@
 import { Link, useRoute } from 'wouter'
-
-import { Button } from '@/shared/components/ui/button'
 import { formatDate } from '@/shared/lib/formatDate'
-import { useDocument } from '@/modules/documents/hooks/useDocument'
-import { AddDocumentEventForm } from '@/modules/documents/components/AddDocumentEventForm'
+
+import Detail from '@/shared/components/Detail'
 import { Can } from '@/modules/documents/components/Can'
+import { Button } from '@/shared/components/ui/button'
+import { Separator } from '@/shared/components/ui/separator'
+import EventTimeline from '@/shared/components/EventTimeline'
+import { useDocument } from '@/modules/documents/hooks/useDocument'
+// import { AddDocumentEventForm } from '@/modules/documents/components/AddDocumentEventForm'
+import {
+  ArrowLeftIcon,
+  CalendarIcon,
+  FilePenIcon,
+  FileTextIcon,
+  HashIcon,
+  MapPinIcon,
+  PanelTopIcon,
+} from 'lucide-react'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/shared/components/ui/card'
 
 export function DocumentDetailPage() {
   const [, params] = useRoute('/documents/:id')
@@ -23,101 +41,155 @@ export function DocumentDetailPage() {
   const document = documentQuery.data
 
   return (
-    <section className="space-y-6 p-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">{document.officeNumber}</h1>
-          <p className="text-muted-foreground">
-            Detalle completo del documento
-          </p>
+    <>
+      <div className="mb-2 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="size-11 bg-primary text-primary-foreground flex shrink-0 items-center justify-center rounded-lg">
+            <FileTextIcon size={20} />
+          </div>
+
+          <div>
+            <p className="text-sm font-medium text-muted-foreground">
+              {document.documentType.name}
+            </p>
+            <h1 className="text-balance text-2xl font-semibold tracking-tight text-foreground">
+              {document.officeNumber}
+            </h1>
+          </div>
         </div>
 
-        <Link href="/documents">
-          <Button variant="outline">Volver</Button>
-        </Link>
+        <div className="flex items-center gap-2">
+          <Can permission="documents:create">
+            <Link to="/documents/create">
+              <Button size="lg">
+                <FilePenIcon />
+                Editar
+              </Button>
+            </Link>
+          </Can>
+
+          <Link href="/documents">
+            <Button variant="outline" size="lg">
+              <ArrowLeftIcon />
+              Volver
+            </Button>
+          </Link>
+        </div>
       </div>
 
-      <div className="grid gap-4 rounded-md border p-4 md:grid-cols-2">
-        <Detail label="No. oficio" value={document.officeNumber} />
-        <Detail label="No. expediente" value={document.caseNumber} />
-        <Detail label="Actor" value={document.actor} />
-        <Detail label="Demandado" value={document.defendant} />
-        <Detail label="Tipo" value={document.documentType.name} />
-        <Detail label="Estatus" value={document.currentStatus.name} />
-        <Detail
-          label="Fecha de oficio"
-          value={formatDate(document.officeDate)}
-        />
-        <Detail
-          label="Fecha de recibido"
-          value={formatDate(document.receivedDate)}
-        />
-        <Detail
-          label="Ubicación física"
-          value={document.physicalLocation?.name}
-        />
-        <Detail label="Gaveta" value={document.physicalLocation?.drawer} />
-      </div>
+      <section className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <HashIcon className="size-4 text-muted-foreground" /> Datos
+              generales
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <dl className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
+              <Detail label="Número de oficio" value={document.officeNumber} />
+              <Detail
+                label="Número de expediente"
+                value={document.caseNumber}
+              />
+              <Detail
+                label="Tipo de documento"
+                value={document.documentType.name}
+              />
+              <Detail
+                label="Estado actual"
+                value={document.currentStatus.name}
+              />
+              <Detail label="Actor" value={document.actor} />
+              <Detail label="Demandado" value={document.defendant} />
+            </dl>
+          </CardContent>
+        </Card>
 
-      <div className="rounded-md border p-4">
-        <h2 className="mb-2 text-lg font-semibold">Anexos</h2>
-        <p>{document.annexes ?? 'Sin anexos'}</p>
-      </div>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <CalendarIcon className="size-4 text-muted-foreground" /> Fechas y
+              ubicación
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <dl className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
+              <Detail
+                label="Fecha de oficio"
+                value={formatDate({
+                  value: document.officeDate,
+                  withTime: true,
+                  monthFormat: 'long',
+                })}
+              />
+              <Detail
+                label="Fecha de recepción"
+                value={formatDate({
+                  value: document.receivedDate,
+                  withTime: true,
+                  monthFormat: 'long',
+                })}
+              />
+              <Detail
+                label="Ubicación física"
+                value={
+                  document.physicalLocation && (
+                    <span className="inline-flex items-center gap-1">
+                      <MapPinIcon className="size-3.5 " />
+                      {document.physicalLocation.name}
+                    </span>
+                  )
+                }
+              />
+              <Detail
+                label="Gaveta"
+                value={
+                  document.physicalLocation && (
+                    <span className="inline-flex items-center gap-1">
+                      <PanelTopIcon className="size-3.5 " />
+                      {document.physicalLocation.drawer}
+                    </span>
+                  )
+                }
+              />
+              <Detail
+                label="Registrado por"
+                value={document.createdBy.fullName}
+              />
+            </dl>
+          </CardContent>
+        </Card>
 
-      <div className="rounded-md border p-4">
-        <h2 className="mb-2 text-lg font-semibold">Observaciones</h2>
-        <p>{document.observations ?? 'Sin observaciones'}</p>
-      </div>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Anexos y observaciones</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <dl className="grid grid-cols-1 gap-y-5">
+              <Detail label="Anexos" value={document.annexes} />
+              <Detail label="Observaciones" value={document.observations} />
+            </dl>
+          </CardContent>
+        </Card>
 
-      <Can permission="documents:events:create">
-        <AddDocumentEventForm
-          documentId={documentId}
-          currentStatusId={document.currentStatus.id}
-        />
-      </Can>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Historial de eventos</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <EventTimeline events={document.events} />
+          </CardContent>
+        </Card>
 
-      <div className="rounded-md border p-4">
-        <h2 className="mb-4 text-lg font-semibold">Bitácora</h2>
+        <Separator />
 
-        {document.events.length === 0 ? (
-          <p className="text-muted-foreground">Sin eventos registrados</p>
-        ) : (
-          <div className="space-y-3">
-            {document.events.map((event) => (
-              <div key={event.id} className="rounded-md border p-3">
-                <div className="flex justify-between gap-4">
-                  <strong>{event.eventType}</strong>
-                  <span className="text-muted-foreground text-sm">
-                    {formatDate(event.createdAt)}
-                  </span>
-                </div>
-
-                {event.note && <p className="mt-2">{event.note}</p>}
-
-                <p className="text-muted-foreground mt-2 text-xs">
-                  Registrado por {event.createdBy?.fullName ?? 'Usuario'}
-                </p>
-
-                {(event.fromStatus?.name || event.toStatus?.name) && (
-                  <p className="text-muted-foreground mt-2 text-sm">
-                    {event.fromStatus?.name ?? 'Sin estado'} →{' '}
-                    {event.toStatus?.name ?? 'Sin estado'}
-                  </p>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </section>
-  )
-}
-
-function Detail({ label, value }: { label: string; value?: string | null }) {
-  return (
-    <div>
-      <p className="text-muted-foreground text-sm">{label}</p>
-      <p className="font-medium">{value || '-'}</p>
-    </div>
+        <p className="text-center text-xs text-muted-foreground">
+          Creado el {formatDate({ value: document.createdAt, withTime: true })}{' '}
+          · Última actualización{' '}
+          {formatDate({ value: document.updatedAt, withTime: true })}
+        </p>
+      </section>
+    </>
   )
 }

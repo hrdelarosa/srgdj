@@ -54,8 +54,12 @@ export function DocumentsTable({ documents }: DocumentsTableProps) {
                 <TableCell>{document.caseNumber ?? '-'}</TableCell>
                 <TableCell>{document.actor ?? '-'}</TableCell>
                 <TableCell>{document.defendant ?? '-'}</TableCell>
-                <TableCell>{formatDate(document.officeDate)}</TableCell>
-                <TableCell>{formatDate(document.receivedDate)}</TableCell>
+                <TableCell>
+                  {formatDate({ value: document.officeDate })}
+                </TableCell>
+                <TableCell>
+                  {formatDate({ value: document.receivedDate })}
+                </TableCell>
                 <TableCell>{document.documentType.name}</TableCell>
                 <TableCell>{document.currentStatus.name}</TableCell>
 

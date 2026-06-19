@@ -7,15 +7,17 @@ import {
 } from 'react-hook-form'
 import { z, type ZodType } from 'zod'
 
-interface Props<Schema extends ZodType<FieldValues, FieldValues>> {
+interface Props<Schema extends ZodType> {
   formSchema: Schema
-  defaultValues?: DefaultValues<z.infer<Schema>>
-  onSubmit: SubmitHandler<z.infer<Schema>>
+  defaultValues?: DefaultValues<z.input<Schema>>
+  onSubmit: SubmitHandler<z.output<Schema>>
 }
 
-export function useValidatedForm<
-  Schema extends ZodType<FieldValues, FieldValues>,
->({ formSchema, defaultValues, onSubmit }: Props<Schema>) {
+export function useValidatedForm<Schema extends ZodType>({
+  formSchema,
+  defaultValues,
+  onSubmit,
+}: Props<Schema>) {
   const {
     register,
     handleSubmit,
@@ -24,13 +26,13 @@ export function useValidatedForm<
     control,
     setValue,
     watch,
-  } = useForm<z.infer<Schema>, unknown, z.output<Schema>>({
+  } = useForm<z.input<Schema> & FieldValues, unknown, z.output<Schema>>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(formSchema as any),
-    defaultValues,
+    defaultValues: defaultValues as DefaultValues<z.input<Schema> & FieldValues>,
   })
 
-  const handleFormSubmit: SubmitHandler<z.infer<Schema>> = async (data) => {
+  const handleFormSubmit: SubmitHandler<z.output<Schema>> = async (data) => {
     try {
       await onSubmit(data)
     } catch (error) {

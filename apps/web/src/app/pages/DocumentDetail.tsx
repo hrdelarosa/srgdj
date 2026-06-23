@@ -7,7 +7,6 @@ import { Button } from '@/shared/components/ui/button'
 import { Separator } from '@/shared/components/ui/separator'
 import EventTimeline from '@/shared/components/EventTimeline'
 import { useDocument } from '@/modules/documents/hooks/useDocument'
-// import { AddDocumentEventForm } from '@/modules/documents/components/AddDocumentEventForm'
 import {
   ArrowLeftIcon,
   CalendarIcon,
@@ -27,7 +26,6 @@ import {
 export function DocumentDetailPage() {
   const [, params] = useRoute('/documents/:id')
   const documentId = params?.id ?? ''
-
   const documentQuery = useDocument(documentId)
 
   if (documentQuery.isLoading) {
@@ -60,7 +58,7 @@ export function DocumentDetailPage() {
 
         <div className="flex items-center gap-2">
           <Can permission="documents:create">
-            <Link to="/documents/create">
+            <Link to={`/documents/${documentId}/edit`}>
               <Button size="lg">
                 <FilePenIcon />
                 Editar
@@ -152,6 +150,10 @@ export function DocumentDetailPage() {
                     </span>
                   )
                 }
+              />
+              <Detail
+                label="Referencia"
+                value={document.physicalLocation?.reference}
               />
               <Detail
                 label="Registrado por"

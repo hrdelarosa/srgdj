@@ -11,7 +11,7 @@ export function formatDate({
 }: FormatDateOptions): string {
   if (!value) return '-'
 
-  const date = typeof value === 'string' ? new Date(value) : value
+  const date = toDisplayDate(value)
 
   return new Intl.DateTimeFormat('es-MX', {
     day: '2-digit',
@@ -29,9 +29,27 @@ export function getDateInputValue(value: Date | string | null | undefined) {
     if (dateOnly) return dateOnly
   }
 
-  const date = new Date(value)
+  const date = toDisplayDate(value)
 
   if (Number.isNaN(date.getTime())) return ''
 
-  return date.toISOString().slice(0, 10)
+  return [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, '0'),
+    String(date.getDate()).padStart(2, '0'),
+  ].join('-')
+}
+
+function toDisplayDate(value: Date | string) {
+  if (typeof value !== 'string') return value
+
+  const dateOnly = value.match(/^(\d{4})-(\d{2})-(\d{2})$/)?.slice(1)
+
+  if (dateOnly) {
+    const [year, month, day] = dateOnly.map(Number)
+
+    return new Date(year!, month! - 1, day!)
+  }
+
+  return new Date(value)
 }

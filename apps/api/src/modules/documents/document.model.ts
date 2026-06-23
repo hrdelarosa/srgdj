@@ -12,6 +12,7 @@ import {
   like,
   lte,
   or,
+  sql,
 } from 'drizzle-orm'
 import {
   CreateDocumentModelInput,
@@ -34,6 +35,15 @@ import { alias } from 'drizzle-orm/mysql-core'
 const fromStatus = alias(documentStatuses, 'from_status')
 const toStatus = alias(documentStatuses, 'to_status')
 const eventCreator = alias(users, 'event_creator')
+
+function parseLocalDate(value: string | Date | undefined | null) {
+  if (!value) return null
+  if (value instanceof Date) return value
+
+  const [year, month, day] = value.split('-').map(Number)
+
+  return new Date(year!, month! - 1, day!)
+}
 
 export class DocumentModel {
   static async findAll({
@@ -94,8 +104,8 @@ export class DocumentModel {
         receivedDate: documents.receivedDate,
         annexes: documents.annexes,
         observations: documents.observations,
-        createdAt: documents.createdAt,
-        updatedAt: documents.updatedAt,
+        createdAt: sql<string>`date_format(${documents.createdAt}, '%Y-%m-%dT%H:%i:%s')`,
+        updatedAt: sql<string>`date_format(${documents.updatedAt}, '%Y-%m-%dT%H:%i:%s')`,
 
         documentType: {
           id: documentTypes.id,
@@ -167,8 +177,8 @@ export class DocumentModel {
         receivedDate: documents.receivedDate,
         annexes: documents.annexes,
         observations: documents.observations,
-        createdAt: documents.createdAt,
-        updatedAt: documents.updatedAt,
+        createdAt: sql<string>`date_format(${documents.createdAt}, '%Y-%m-%dT%H:%i:%s')`,
+        updatedAt: sql<string>`date_format(${documents.updatedAt}, '%Y-%m-%dT%H:%i:%s')`,
 
         documentType: {
           id: documentTypes.id,
@@ -215,7 +225,7 @@ export class DocumentModel {
         eventType: documentEvents.eventType,
         note: documentEvents.note,
         metadata: documentEvents.metadata,
-        createdAt: documentEvents.createdAt,
+        createdAt: sql<string>`date_format(${documentEvents.createdAt}, '%Y-%m-%dT%H:%i:%s')`,
         fromStatus: {
           id: fromStatus.id,
           code: fromStatus.code,
@@ -257,8 +267,8 @@ export class DocumentModel {
         receivedDate: documents.receivedDate,
         annexes: documents.annexes,
         observations: documents.observations,
-        createdAt: documents.createdAt,
-        updatedAt: documents.updatedAt,
+        createdAt: sql<string>`date_format(${documents.createdAt}, '%Y-%m-%dT%H:%i:%s')`,
+        updatedAt: sql<string>`date_format(${documents.updatedAt}, '%Y-%m-%dT%H:%i:%s')`,
       })
       .from(documents)
       .where(eq(documents.officeNumber, officeNumber))
@@ -281,8 +291,8 @@ export class DocumentModel {
         actor: document.actor ?? null,
         defendant: document.defendant ?? null,
         documentTypeId: document.documentTypeId,
-        officeDate: document.officeDate ? new Date(document.officeDate) : null,
-        receivedDate: new Date(document.receivedDate),
+        officeDate: parseLocalDate(document.officeDate),
+        receivedDate: parseLocalDate(document.receivedDate)!,
         annexes: document.annexes ?? null,
         physicalLocationId: document.physicalLocationId ?? null,
         currentStatusId: document.currentStatusId,
@@ -336,12 +346,10 @@ export class DocumentModel {
     if (document.documentTypeId !== undefined)
       updatedFields.documentTypeId = document.documentTypeId
     if (document.officeDate !== undefined) {
-      updatedFields.officeDate = document.officeDate
-        ? new Date(document.officeDate)
-        : null
+      updatedFields.officeDate = parseLocalDate(document.officeDate)
     }
     if (document.receivedDate !== undefined)
-      updatedFields.receivedDate = new Date(document.receivedDate)
+      updatedFields.receivedDate = parseLocalDate(document.receivedDate)!
     if (document.annexes !== undefined)
       updatedFields.annexes = document.annexes ?? null
     if (document.physicalLocationId !== undefined)
@@ -431,7 +439,7 @@ export class DocumentModel {
         eventType: documentEvents.eventType,
         note: documentEvents.note,
         metadata: documentEvents.metadata,
-        createdAt: documentEvents.createdAt,
+        createdAt: sql<string>`date_format(${documentEvents.createdAt}, '%Y-%m-%dT%H:%i:%s')`,
 
         fromStatus: {
           id: fromStatus.id,

@@ -19,6 +19,22 @@ const optionalTextSchema = z
   .optional()
   .transform((value) => (value === '' ? undefined : value))
 
+const localDateSchema = (message: string) =>
+  z
+    .string({ error: message })
+    .trim()
+    .min(1, message)
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'La fecha no es válida')
+
+const optionalLocalDateSchema = z
+  .string()
+  .trim()
+  .optional()
+  .transform((value) => (value === '' ? undefined : value))
+  .refine((value) => !value || /^\d{4}-\d{2}-\d{2}$/.test(value), {
+    message: 'La fecha no es válida',
+  })
+
 export const createDocumentSchema = z.object({
   officeNumber: z
     .string()
@@ -43,11 +59,11 @@ export const createDocumentSchema = z.object({
 
   documentTypeId: uuidSchema('El tipo de documento es requerido'),
 
-  officeDate: z.coerce.date().optional(),
+  officeDate: optionalLocalDateSchema,
 
-  receivedDate: z.coerce.date({
-    error: 'La fecha de recibido es obligatoria o no es válida',
-  }),
+  receivedDate: localDateSchema(
+    'La fecha de recibido es obligatoria o no es válida',
+  ),
 
   annexes: optionalTextSchema,
 

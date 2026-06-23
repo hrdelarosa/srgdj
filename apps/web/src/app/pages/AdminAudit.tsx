@@ -31,11 +31,10 @@ export function AdminAuditPage() {
           {
             key: 'date',
             label: 'Fecha',
-            render: (log) => formatDate(log.createdAt),
+            render: (log) => formatDate({ value: log.createdAt }),
           },
         ]}
       />
     </section>
   )
 }
-

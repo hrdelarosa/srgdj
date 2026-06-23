@@ -29,8 +29,8 @@ export interface DocumentListItem {
   receivedDate: Date
   annexes: string | null
   observations: string | null
-  createdAt: Date
-  updatedAt: Date
+  createdAt: Date | string
+  updatedAt: Date | string
   documentType: {
     id: string
     code: string

@@ -1,7 +1,5 @@
 import { FilePlus2Icon } from 'lucide-react'
-import { useEffect } from 'react'
 import { Link } from 'wouter'
-import { createDocumentSchema } from '@srgdj/shared'
 
 import { Button } from '@/shared/components/ui/button'
 import { Input } from '@/shared/components/ui/input'
@@ -12,7 +10,6 @@ import {
   FieldGroup,
   FieldLabel,
 } from '@/shared/components/ui/field'
-import { useCreateDocument } from '@/modules/documents/hooks/useCreateDocument'
 import {
   Select,
   SelectContent,
@@ -21,51 +18,26 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/components/ui/select'
-import {
-  useDocumentStatuses,
-  useDocumentTypes,
-} from '@/modules/documents/hooks/useDocumentCatalogs'
-import { useValidatedForm } from '@/shared/hooks/useValidatedForm'
-import { Controller } from 'react-hook-form'
+import { useCreateDocumentForm } from '@/modules/documents/hooks/useCreateDocumentForm'
 
 export function CreateDocumentPage() {
-  const createMutation = useCreateDocument()
-  const types = useDocumentTypes()
-  const statuses = useDocumentStatuses()
-  const { register, handleSubmit, errors, control, setValue, watch } =
-    useValidatedForm({
-      formSchema: createDocumentSchema,
-      onSubmit: (data) => createMutation.mutate({ data }),
-      defaultValues: {
-        officeNumber: '',
-        caseNumber: '',
-        actor: '',
-        defendant: '',
-        documentTypeId: '',
-        annexes: '',
-        physicalLocationId: undefined,
-        currentStatusId: '',
-        observations: '',
-      },
-    })
-
-  useEffect(() => {
-    const firstTypeId = types.data?.items[0]?.id
-    const lastStatusId = statuses.data?.items.at(-1)?.id
-
-    if (firstTypeId && !watch('documentTypeId')) {
-      setValue('documentTypeId', firstTypeId)
-    }
-
-    if (lastStatusId && !watch('currentStatusId')) {
-      setValue('currentStatusId', lastStatusId)
-    }
-  }, [types.data, statuses.data, setValue, watch])
+  const {
+    register,
+    handleSubmit,
+    errors,
+    createMutation,
+    typesQuery,
+    statusesQuery,
+    documentTypeId,
+    currentStatusId,
+    handleDocumentTypeChange,
+    handleStatusChange,
+  } = useCreateDocumentForm()
 
   return (
     <>
       <div>
-        <h2 className="text-2xl font-bold">Registrar documento</h2>
+        <h1 className="text-2xl font-bold">Registrar documento</h1>
         <p className="text-sm text-muted-foreground">
           Completa el formulario para registrar un nuevo documento en el
           sistema.
@@ -75,41 +47,54 @@ export function CreateDocumentPage() {
       <form onSubmit={handleSubmit} className="space-y-5">
         <FieldGroup className="grid grid-cols-3 gap-3">
           <Field>
-            <FieldLabel>No. oficio</FieldLabel>
-            <Input {...register('officeNumber')} />
+            <FieldLabel id="officeNumber">No. oficio</FieldLabel>
+            <Input
+              {...register('officeNumber')}
+              id="officeNumber"
+              type="text"
+              autoCapitalize="words"
+              autoFocus
+              aria-invalid={!!errors.officeNumber}
+            />
             <FieldError>{errors.officeNumber?.message}</FieldError>
           </Field>
 
           <Field>
-            <FieldLabel>No. expediente</FieldLabel>
-            <Input {...register('caseNumber')} />
+            <FieldLabel id="caseNumber">No. expediente</FieldLabel>
+            <Input
+              {...register('caseNumber')}
+              id="caseNumber"
+              type="text"
+              aria-invalid={!!errors.caseNumber}
+            />
             <FieldError>{errors.caseNumber?.message}</FieldError>
           </Field>
 
           <Field>
             <FieldLabel htmlFor="documentType">Tipo de documento</FieldLabel>
 
-            <Controller
-              name="documentTypeId"
-              control={control}
-              render={({ field }) => (
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger className="w-full" id="documentType">
-                    <SelectValue />
-                  </SelectTrigger>
+            <Select
+              value={documentTypeId}
+              onValueChange={handleDocumentTypeChange}
+            >
+              <SelectTrigger
+                className="w-full"
+                id="documentType"
+                aria-invalid={!!errors.documentTypeId}
+              >
+                <SelectValue placeholder="Selecciona un tipo" />
+              </SelectTrigger>
 
-                  <SelectContent>
-                    <SelectGroup>
-                      {types.data?.items.map((type) => (
-                        <SelectItem key={type.id} value={type.id}>
-                          {type.name}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              )}
-            />
+              <SelectContent>
+                <SelectGroup>
+                  {typesQuery.data?.items.map((type) => (
+                    <SelectItem key={type.id} value={type.id}>
+                      {type.name}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
 
             <FieldError>{errors.documentTypeId?.message}</FieldError>
           </Field>
@@ -117,14 +102,24 @@ export function CreateDocumentPage() {
 
         <FieldGroup className="grid grid-cols-3 gap-3">
           <Field>
-            <FieldLabel>Actor</FieldLabel>
-            <Input {...register('actor')} />
+            <FieldLabel id="actor">Actor</FieldLabel>
+            <Input
+              {...register('actor')}
+              id="actor"
+              type="text"
+              aria-invalid={!!errors.actor}
+            />
             <FieldError>{errors.actor?.message}</FieldError>
           </Field>
 
           <Field>
-            <FieldLabel>Demandado</FieldLabel>
-            <Input {...register('defendant')} />
+            <FieldLabel id="defendant">Demandado</FieldLabel>
+            <Input
+              {...register('defendant')}
+              id="defendant"
+              type="text"
+              aria-invalid={!!errors.defendant}
+            />
             <FieldError>{errors.defendant?.message}</FieldError>
           </Field>
 
@@ -133,53 +128,59 @@ export function CreateDocumentPage() {
               Estatus del documento
             </FieldLabel>
 
-            <Controller
-              name="currentStatusId"
-              control={control}
-              render={({ field }) => (
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger className="w-full" id="documentStatus">
-                    <SelectValue />
-                  </SelectTrigger>
+            <Select value={currentStatusId} onValueChange={handleStatusChange}>
+              <SelectTrigger
+                className="w-full"
+                id="documentStatus"
+                aria-invalid={!!errors.currentStatusId}
+              >
+                <SelectValue placeholder="Selecciona un estatus" />
+              </SelectTrigger>
 
-                  <SelectContent>
-                    <SelectGroup>
-                      {statuses.data?.items.map((status) => (
-                        <SelectItem key={status.id} value={status.id}>
-                          {status.name}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              )}
-            />
+              <SelectContent>
+                <SelectGroup>
+                  {statusesQuery.data?.items.map((status) => (
+                    <SelectItem key={status.id} value={status.id}>
+                      {status.name}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+
+            <FieldError>{errors.currentStatusId?.message}</FieldError>
           </Field>
         </FieldGroup>
 
         <FieldGroup className="grid grid-cols-4 gap-3">
-          <Field>
+          <Field id="officeDate">
             <FieldLabel>Fecha de oficio</FieldLabel>
-            <Input type="date" {...register('officeDate')} />
+            <Input {...register('officeDate')} id="officeDate" type="date" />
           </Field>
 
           <Field>
             <FieldLabel>Fecha de recibido</FieldLabel>
-            <Input type="date" {...register('receivedDate')} />
+            <Input
+              {...register('receivedDate')}
+              id="receivedDate"
+              type="date"
+              aria-invalid={!!errors.receivedDate}
+            />
             <FieldError>{errors.receivedDate?.message}</FieldError>
           </Field>
 
           <Field className="col-span-2 row-span-2">
-            <FieldLabel>Observaciones</FieldLabel>
+            <FieldLabel id="observations">Observaciones</FieldLabel>
             <Textarea
               className="resize-none flex-1"
               {...register('observations')}
+              id="observations"
             />
           </Field>
 
           <Field className="col-span-2 col-start-1">
-            <FieldLabel>Anexos</FieldLabel>
-            <Input {...register('annexes')} />
+            <FieldLabel id="annexes">Anexos</FieldLabel>
+            <Input {...register('annexes')} id="annexes" type="text" />
           </Field>
         </FieldGroup>
 

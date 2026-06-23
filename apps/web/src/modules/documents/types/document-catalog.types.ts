@@ -17,3 +17,10 @@ export interface DocumentStatusOption {
   sortOrder: number
   isTerminal: boolean
 }
+
+export interface PhysicalLocationOption {
+  id: string
+  name: string
+  drawer: string | null
+  reference: string | null
+}

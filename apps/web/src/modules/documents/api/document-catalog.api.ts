@@ -3,6 +3,7 @@ import type {
   CatalogResponse,
   DocumentStatusOption,
   DocumentTypeOption,
+  PhysicalLocationOption,
 } from '../types/document-catalog.types'
 
 export async function getDocumentTypes() {
@@ -11,4 +12,10 @@ export async function getDocumentTypes() {
 
 export async function getDocumentStatuses() {
   return apiClient<CatalogResponse<DocumentStatusOption>>('/document-statuses')
+}
+
+export async function getPhysicalLocations() {
+  return apiClient<CatalogResponse<PhysicalLocationOption>>(
+    '/physical-locations',
+  )
 }

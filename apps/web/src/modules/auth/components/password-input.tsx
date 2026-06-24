@@ -34,6 +34,7 @@ export default function PasswordInput({
           {...props}
           id={props.id}
           type={showPassword ? 'text' : 'password'}
+          aria-invalid={!!error}
         />
         <InputGroupAddon align="inline-end">
           <Button

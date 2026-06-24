@@ -55,6 +55,7 @@ type Items<T> = { items: T[] }
 
 export const adminApi = {
   users: () => apiClient<Items<AdminUser>>('/users'),
+  user: (id: string) => apiClient<AdminUser>(`/users/${id}`),
   createUser: (data: {
     username: string
     password: string
@@ -72,9 +73,12 @@ export const adminApi = {
       body: JSON.stringify(data),
     }),
   setUserActive: (id: string, active: boolean) =>
-    apiClient<AdminUser>(`/users/${id}/${active ? 'activate' : 'desactivate'}`, {
-      method: 'PATCH',
-    }),
+    apiClient<AdminUser>(
+      `/users/${id}/${active ? 'activate' : 'desactivate'}`,
+      {
+        method: 'PATCH',
+      },
+    ),
 
   roles: () => apiClient<Items<Role>>('/roles'),
   createRole: (data: Partial<Role>) =>
@@ -128,4 +132,3 @@ export const adminApi = {
 
   auditLogs: () => apiClient<{ items: AuditLog[] }>('/audit-logs'),
 }
-

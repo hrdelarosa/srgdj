@@ -36,7 +36,7 @@ import { Controller } from 'react-hook-form'
 export default function EditUserDialog({ id }: { id: string }) {
   const [open, setOpen] = useState(false)
   const { user, updateUser } = useUsers(id)
-  const { roles } = useRoles()
+  const { rolesQuery } = useRoles()
   const { register, handleSubmit, errors, reset, control } = useValidatedForm({
     formSchema: editUserFormSchema,
     defaultValues: {
@@ -132,7 +132,7 @@ export default function EditUserDialog({ id }: { id: string }) {
 
                     <SelectContent>
                       <SelectGroup>
-                        {roles.data?.items.map((role) => (
+                        {rolesQuery.data?.items.map((role) => (
                           <SelectItem key={role.id} value={role.id}>
                             {role.name}
                           </SelectItem>

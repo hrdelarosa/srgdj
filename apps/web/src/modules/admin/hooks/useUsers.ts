@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { adminApi } from '../../api/admin.api'
+import { adminApi } from '../api/admin.api'
 import type { ApiError } from '@/shared/types/errors.type'
-import type { EditUserFormInput } from '../../schemas/users.schema'
+import type { EditUserFormInput } from '../schemas/users.schema'
 import { toast } from 'sonner'
 
 export function useUsers(id?: string) {

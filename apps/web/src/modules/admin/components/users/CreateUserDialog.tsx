@@ -30,8 +30,8 @@ import {
   SelectValue,
 } from '@/shared/components/ui/select'
 import { useValidatedForm } from '@/shared/hooks/useValidatedForm'
-import { useUsers } from '../hooks/useUsers'
-import { useRoles } from '../hooks/useRoles'
+import { useUsers } from '../../hooks/useUsers'
+import { useRoles } from '../../hooks/useRoles'
 
 export default function CreateUserDialog() {
   const [open, setOpen] = useState(false)

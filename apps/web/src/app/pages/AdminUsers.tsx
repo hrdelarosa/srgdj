@@ -17,7 +17,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/shared/components/ui/tooltip'
-import { useUsers } from '@/modules/admin/components/hooks/useUsers'
+import { useUsers } from '@/modules/admin/hooks/useUsers'
 
 export function AdminUsersPage() {
   const { usersQuery, changeUserActive } = useUsers()

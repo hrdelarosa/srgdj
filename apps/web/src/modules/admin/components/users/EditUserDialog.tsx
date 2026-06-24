@@ -29,8 +29,8 @@ import {
   SelectValue,
 } from '@/shared/components/ui/select'
 import { useValidatedForm } from '@/shared/hooks/useValidatedForm'
-import { useUsers } from '../hooks/useUsers'
-import { useRoles } from '../hooks/useRoles'
+import { useUsers } from '../../hooks/useUsers'
+import { useRoles } from '../../hooks/useRoles'
 import { Controller } from 'react-hook-form'
 
 export default function EditUserDialog({ id }: { id: string }) {

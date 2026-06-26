@@ -1,9 +1,7 @@
-import { ToggleLeftIcon, ToggleRightIcon } from 'lucide-react'
-
-import { Button } from '@/shared/components/ui/button'
 import { Badge } from '@/shared/components/ui/badge'
 import EditUserDialog from '@/modules/admin/components/users/EditUserDialog'
 import CreateUserDialog from '@/modules/admin/components/users/CreateUserDialog'
+import StatusToggleButton from '@/modules/admin/components/StatusToggleButton'
 import {
   Table,
   TableBody,
@@ -12,11 +10,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/shared/components/ui/table'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/shared/components/ui/tooltip'
 import { useUsers } from '@/modules/admin/hooks/useUsers'
 
 export function AdminUsersPage() {
@@ -88,34 +81,17 @@ export function AdminUsersPage() {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant={user.isActive ? 'destructive' : 'outline'}
-                            size="icon"
-                            className="cursor-pointer"
-                            onClick={() =>
-                              changeUserActive.mutate({
-                                id: user.id,
-                                active: !user.isActive,
-                              })
-                            }
-                          >
-                            {user.isActive ? (
-                              <ToggleRightIcon />
-                            ) : (
-                              <ToggleLeftIcon />
-                            )}
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent side="right">
-                          <p>
-                            {user.isActive
-                              ? 'Desactivar usuario'
-                              : 'Activar usuario'}
-                          </p>
-                        </TooltipContent>
-                      </Tooltip>
+                      <StatusToggleButton
+                        isActive={user.isActive}
+                        onToggle={() =>
+                          changeUserActive.mutate({
+                            id: user.id,
+                            active: !user.isActive,
+                          })
+                        }
+                        label="usuario"
+                      />
+
                       <EditUserDialog id={user.id} />
                     </div>
                   </TableCell>

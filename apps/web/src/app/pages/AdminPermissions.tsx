@@ -1,104 +1,116 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
-import { adminApi, type Permission } from '@/modules/admin/api/admin.api'
-import { AdminTable, StatusBadge } from '@/modules/admin/components/AdminTable'
-import { Button } from '@/shared/components/ui/button'
-import { Input } from '@/shared/components/ui/input'
+import StatusToggleButton from '@/modules/admin/components/StatusToggleButton'
+import EditPermissionsDialog from '@/modules/admin/components/permissions/EditPermissionsDialog'
+import { Badge } from '@/shared/components/ui/badge'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/shared/components/ui/table'
+import CreatePermissionsDialog from '@/modules/admin/components/permissions/CreatePermissionsDialog'
+import { usePermissions } from '@/modules/admin/hooks/usePermissions'
 
 export function AdminPermissionsPage() {
-  const queryClient = useQueryClient()
-  const permissionsQuery = useQuery({
-    queryKey: ['admin-permissions'],
-    queryFn: adminApi.permissions,
-  })
-  const [editing, setEditing] = useState<Permission | null>(null)
-  const [form, setForm] = useState({ code: '', name: '', description: '' })
-
-  const saveMutation = useMutation({
-    mutationFn: () =>
-      editing
-        ? adminApi.updatePermission(editing.id, {
-            name: form.name,
-            description: form.description,
-          })
-        : adminApi.createPermission({ ...form, isSystem: false, isActive: true }),
-    onSuccess: () => {
-      setEditing(null)
-      setForm({ code: '', name: '', description: '' })
-      queryClient.invalidateQueries({ queryKey: ['admin-permissions'] })
-    },
-  })
-
-  function edit(permission: Permission) {
-    setEditing(permission)
-    setForm({
-      code: permission.code,
-      name: permission.name,
-      description: permission.description ?? '',
-    })
-  }
+  const { permissionsQuery, changePermissionsActive } = usePermissions()
+  const permissions = permissionsQuery.data?.items ?? []
 
   return (
-    <section className="space-y-5 p-6">
-      <header>
-        <h1 className="text-2xl font-bold">Permisos</h1>
-        <p className="text-muted-foreground">
-          Permisos de sistema y personalizados para crecimiento futuro.
-        </p>
-      </header>
+    <>
+      <div className="mb-2 flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold">Permisos</h2>
+          <p className="text-sm text-muted-foreground">
+            Aquí puedes gestionar los permios del sistema, crear nuevos
+            permisos, editar información y activar o desactivar permisos según
+            sea necesario.
+          </p>
+        </div>
 
-      <form
-        className="grid gap-3 rounded-md border p-4 md:grid-cols-4"
-        onSubmit={(event) => {
-          event.preventDefault()
-          saveMutation.mutate()
-        }}
-      >
-        <Input
-          placeholder="Código"
-          value={form.code}
-          disabled={Boolean(editing)}
-          onChange={(event) => setForm({ ...form, code: event.target.value })}
-        />
-        <Input
-          placeholder="Nombre"
-          value={form.name}
-          onChange={(event) => setForm({ ...form, name: event.target.value })}
-        />
-        <Input
-          placeholder="Descripción"
-          value={form.description}
-          onChange={(event) =>
-            setForm({ ...form, description: event.target.value })
-          }
-        />
-        <Button type="submit">{editing ? 'Guardar' : 'Crear permiso'}</Button>
-      </form>
+        <CreatePermissionsDialog />
+      </div>
 
-      <AdminTable
-        items={permissionsQuery.data?.items ?? []}
-        columns={[
-          { key: 'code', label: 'Código', render: (permission) => permission.code },
-          { key: 'name', label: 'Nombre', render: (permission) => permission.name },
-          {
-            key: 'kind',
-            label: 'Tipo',
-            render: (permission) =>
-              permission.isSystem ? 'Sistema' : 'Personalizado',
-          },
-          {
-            key: 'status',
-            label: 'Estado',
-            render: (permission) => <StatusBadge active={permission.isActive} />,
-          },
-        ]}
-        actions={(permission) => (
-          <Button variant="outline" size="sm" onClick={() => edit(permission)}>
-            Editar
-          </Button>
-        )}
-      />
-    </section>
+      <div className="overflow-hidden rounded-md border">
+        <Table>
+          <TableHeader className="bg-gray-100/75">
+            <TableRow>
+              <TableHead>Código</TableHead>
+              <TableHead>Nombre</TableHead>
+              <TableHead>Descripción</TableHead>
+              <TableHead>Tipo</TableHead>
+              <TableHead className="w-20">Estado</TableHead>
+              <TableHead className="w-8 text-right">Acciones</TableHead>
+            </TableRow>
+          </TableHeader>
+
+          <TableBody>
+            {permissions.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={5}
+                  className="text-muted-foreground text-center"
+                >
+                  No se encontraron permisos
+                </TableCell>
+              </TableRow>
+            ) : permissionsQuery.isLoading ? (
+              <TableRow>
+                <TableCell
+                  colSpan={5}
+                  className="text-muted-foreground text-center"
+                >
+                  Cargando...
+                </TableCell>
+              </TableRow>
+            ) : (
+              permissions.map((permission) => (
+                <TableRow key={permission.id}>
+                  <TableCell>{permission.code}</TableCell>
+                  <TableCell>{permission.name}</TableCell>
+                  <TableCell className="truncate">
+                    {permission.description ? (
+                      permission.description
+                    ) : (
+                      <p className="text-muted-foreground">Sin descripción</p>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {permission.isSystem ? 'Sistema' : 'Personalizado'}
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      className={`transition-colors ${
+                        permission.isActive
+                          ? 'bg-emerald-100 text-emerald-700'
+                          : 'bg-zinc-100 text-zinc-600'
+                      }`}
+                    >
+                      {permission.isActive ? 'Activo' : 'Inactivo'}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex items-center justify-end gap-2">
+                      <StatusToggleButton
+                        isActive={permission.isActive}
+                        onToggle={() =>
+                          changePermissionsActive.mutate({
+                            id: permission.id,
+                            active: !permission.isActive,
+                          })
+                        }
+                        label="permiso"
+                      />
+
+                      <EditPermissionsDialog id={permission.id} />
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
+    </>
   )
 }
-

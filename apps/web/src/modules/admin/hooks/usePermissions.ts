@@ -45,6 +45,18 @@ export function usePermissions(id?: string) {
     },
   })
 
+  const updateRolePermissionsMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: string[] }) =>
+      adminApi.updateRolePermissions(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['role-permissions'] })
+      queryClient.invalidateQueries({ queryKey: ['role-permissions', id] })
+    },
+    onError: (error: ApiError) => {
+      toast.error(error.error.message ?? 'No se pudo actualizar el permiso')
+    },
+  })
+
   const changePermissionsActiveMutation = useMutation({
     mutationFn: ({ id, active }: { id: string; active: boolean }) =>
       adminApi.setPermissionsActive(id, active),
@@ -63,6 +75,7 @@ export function usePermissions(id?: string) {
     permission: permissionQuery,
     createPermissions: createPermissionsMutation,
     updatePermissions: updatePermissionsMutation,
+    updateRolePermissions: updateRolePermissionsMutation,
     changePermissionsActive: changePermissionsActiveMutation,
   }
 }

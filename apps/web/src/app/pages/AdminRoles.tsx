@@ -1,164 +1,112 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
-import { adminApi, type Permission, type Role } from '@/modules/admin/api/admin.api'
-import { AdminTable, StatusBadge } from '@/modules/admin/components/AdminTable'
-import { Button } from '@/shared/components/ui/button'
-import { Input } from '@/shared/components/ui/input'
+import { Badge } from '@/shared/components/ui/badge'
+import EditRoleSheet from '@/modules/admin/components/roles/EditRoleSheet'
+import EditRoleDialog from '@/modules/admin/components/roles/EditRoleDialog'
+import CreateRoleDialog from '@/modules/admin/components/roles/CreateRoleDialog'
+import StatusToggleButton from '@/modules/admin/components/StatusToggleButton'
+import { ButtonGroup } from '@/shared/components/ui/button-group'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/shared/components/ui/table'
+import { useRoles } from '@/modules/admin/hooks/useRoles'
 
 export function AdminRolesPage() {
-  const queryClient = useQueryClient()
-  const rolesQuery = useQuery({ queryKey: ['admin-roles'], queryFn: adminApi.roles })
-  const permissionsQuery = useQuery({
-    queryKey: ['admin-permissions'],
-    queryFn: adminApi.permissions,
-  })
-  const [selectedRole, setSelectedRole] = useState<Role | null>(null)
-  const [selectedPermissions, setSelectedPermissions] = useState<Set<string>>(
-    new Set(),
-  )
-  const [form, setForm] = useState({ code: '', name: '', description: '' })
-
-  const rolePermissionsQuery = useQuery({
-    queryKey: ['role-permissions', selectedRole?.id],
-    queryFn: () => adminApi.rolePermissions(selectedRole!.id),
-    enabled: Boolean(selectedRole),
-  })
-
-  const saveRoleMutation = useMutation({
-    mutationFn: () =>
-      selectedRole
-        ? adminApi.updateRole(selectedRole.id, form)
-        : adminApi.createRole({ ...form, isActive: true }),
-    onSuccess: () => {
-      setSelectedRole(null)
-      setForm({ code: '', name: '', description: '' })
-      queryClient.invalidateQueries({ queryKey: ['admin-roles'] })
-    },
-  })
-
-  const savePermissionsMutation = useMutation({
-    mutationFn: () =>
-      adminApi.updateRolePermissions(
-        selectedRole!.id,
-        Array.from(selectedPermissions),
-      ),
-    onSuccess: () =>
-      queryClient.invalidateQueries({
-        queryKey: ['role-permissions', selectedRole?.id],
-      }),
-  })
-
-  function editRole(role: Role) {
-    setSelectedRole(role)
-    setForm({
-      code: role.code,
-      name: role.name,
-      description: role.description ?? '',
-    })
-  }
-
-  function loadPermissions() {
-    const current = new Set(rolePermissionsQuery.data?.items.map((item) => item.id))
-    setSelectedPermissions(current)
-  }
+  const { rolesQuery, changeRoleActive } = useRoles()
+  const roles = rolesQuery.data?.items ?? []
 
   return (
-    <section className="space-y-5 p-6">
-      <header>
-        <h1 className="text-2xl font-bold">Roles y permisos</h1>
-        <p className="text-muted-foreground">Administra roles y su matriz de permisos.</p>
-      </header>
-
-      <form
-        className="grid gap-3 rounded-md border p-4 md:grid-cols-4"
-        onSubmit={(event) => {
-          event.preventDefault()
-          saveRoleMutation.mutate()
-        }}
-      >
-        <Input
-          placeholder="Código"
-          value={form.code}
-          onChange={(event) => setForm({ ...form, code: event.target.value })}
-        />
-        <Input
-          placeholder="Nombre"
-          value={form.name}
-          onChange={(event) => setForm({ ...form, name: event.target.value })}
-        />
-        <Input
-          placeholder="Descripción"
-          value={form.description}
-          onChange={(event) =>
-            setForm({ ...form, description: event.target.value })
-          }
-        />
-        <Button type="submit">{selectedRole ? 'Guardar rol' : 'Crear rol'}</Button>
-      </form>
-
-      <div className="grid gap-5 lg:grid-cols-[1fr_420px]">
-        <AdminTable
-          items={rolesQuery.data?.items ?? []}
-          columns={[
-            { key: 'code', label: 'Código', render: (role) => role.code },
-            { key: 'name', label: 'Nombre', render: (role) => role.name },
-            {
-              key: 'status',
-              label: 'Estado',
-              render: (role) => <StatusBadge active={role.isActive} />,
-            },
-          ]}
-          actions={(role) => (
-            <Button variant="outline" size="sm" onClick={() => editRole(role)}>
-              Editar permisos
-            </Button>
-          )}
-        />
-
-        <div className="rounded-md border p-4">
-          <h2 className="font-semibold">
-            {selectedRole ? selectedRole.name : 'Selecciona un rol'}
-          </h2>
-          {selectedRole && (
-            <>
-              <Button
-                type="button"
-                variant="outline"
-                className="mt-3"
-                onClick={loadPermissions}
-              >
-                Cargar permisos actuales
-              </Button>
-              <div className="mt-4 max-h-[420px] space-y-2 overflow-auto">
-                {(permissionsQuery.data?.items ?? []).map((permission: Permission) => (
-                  <label key={permission.id} className="flex items-center gap-2 text-sm">
-                    <input
-                      type="checkbox"
-                      checked={selectedPermissions.has(permission.id)}
-                      onChange={(event) => {
-                        const next = new Set(selectedPermissions)
-                        if (event.target.checked) next.add(permission.id)
-                        else next.delete(permission.id)
-                        setSelectedPermissions(next)
-                      }}
-                    />
-                    <span>{permission.name}</span>
-                    <span className="text-muted-foreground">{permission.code}</span>
-                  </label>
-                ))}
-              </div>
-              <Button
-                className="mt-4"
-                disabled={savePermissionsMutation.isPending}
-                onClick={() => savePermissionsMutation.mutate()}
-              >
-                Guardar permisos
-              </Button>
-            </>
-          )}
+    <>
+      <div className="mb-2 flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold">Roles y Permisos</h2>
+          <p className="text-sm text-muted-foreground">
+            Aquí puedes gestionar los roles y permisos del sistema, crear nuevos
+            roles, editar información y asignar permisos según sea necesario.
+          </p>
         </div>
+
+        <CreateRoleDialog />
       </div>
-    </section>
+
+      <div className="overflow-hidden rounded-md border">
+        <Table>
+          <TableHeader className="bg-gray-100/75">
+            <TableRow>
+              <TableHead>Código</TableHead>
+              <TableHead>Nombre</TableHead>
+              <TableHead>Descripción</TableHead>
+              <TableHead className="w-20">Estado</TableHead>
+              <TableHead className="w-48.5">Acciones</TableHead>
+            </TableRow>
+          </TableHeader>
+
+          <TableBody>
+            {roles.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={5}
+                  className="text-muted-foreground text-center"
+                >
+                  No se encontraron roles
+                </TableCell>
+              </TableRow>
+            ) : rolesQuery.isLoading ? (
+              <TableRow>
+                <TableCell
+                  colSpan={5}
+                  className="text-muted-foreground text-center"
+                >
+                  Cargando...
+                </TableCell>
+              </TableRow>
+            ) : (
+              roles.map((role) => (
+                <TableRow key={role.id}>
+                  <TableCell>{role.code}</TableCell>
+                  <TableCell>{role.name}</TableCell>
+                  <TableCell>{role.description}</TableCell>
+                  <TableCell>
+                    <Badge
+                      className={
+                        role.isActive
+                          ? 'bg-emerald-100 text-emerald-700'
+                          : 'bg-zinc-100 text-zinc-600'
+                      }
+                    >
+                      {role.isActive ? 'Activo' : 'Inactivo'}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <ButtonGroup>
+                      <ButtonGroup>
+                        <StatusToggleButton
+                          isActive={role.isActive}
+                          onToggle={() =>
+                            changeRoleActive.mutate({
+                              id: role.id,
+                              active: !role.isActive,
+                            })
+                          }
+                          label="rol"
+                        />
+                      </ButtonGroup>
+
+                      <ButtonGroup>
+                        <EditRoleDialog id={role.id} />
+                        <EditRoleSheet id={role.id} />
+                      </ButtonGroup>
+                    </ButtonGroup>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
+    </>
   )
 }
-

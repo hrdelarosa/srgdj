@@ -81,6 +81,7 @@ export const adminApi = {
     ),
 
   roles: () => apiClient<Items<Role>>('/roles'),
+  role: (id: string) => apiClient<Role>(`/roles/${id}`),
   createRole: (data: Partial<Role>) =>
     apiClient<Role>('/roles', { method: 'POST', body: JSON.stringify(data) }),
   updateRole: (id: string, data: Partial<Role>) =>
@@ -95,8 +96,13 @@ export const adminApi = {
       method: 'PUT',
       body: JSON.stringify({ permissionIds }),
     }),
+  setRoleActive: (id: string, active: boolean) =>
+    apiClient<Role>(`/roles/${id}/${active ? 'activate' : 'deactivate'}`, {
+      method: 'PATCH',
+    }),
 
   permissions: () => apiClient<Items<Permission>>('/permissions'),
+  permission: (id: string) => apiClient<Permission>(`/permissions/${id}`),
   createPermission: (data: Partial<Permission>) =>
     apiClient<Permission>('/permissions', {
       method: 'POST',
@@ -107,6 +113,13 @@ export const adminApi = {
       method: 'PUT',
       body: JSON.stringify(data),
     }),
+  setPermissionsActive: (id: string, active: boolean) =>
+    apiClient<Permission>(
+      `/permissions/${id}/${active ? 'activate' : 'deactivate'}`,
+      {
+        method: 'PATCH',
+      },
+    ),
 
   catalogs: (endpoint: string) =>
     apiClient<Items<CatalogItem>>(`/${endpoint}?includeInactive=true`),

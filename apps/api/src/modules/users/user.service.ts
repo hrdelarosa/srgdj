@@ -48,6 +48,14 @@ export class UserService {
       })
     }
 
+    if (!role.isActive) {
+      throw new AppError({
+        message: 'No se puede asignar un rol inactivo',
+        statusCode: 400,
+        code: 'INACTIVE_ROLE',
+      })
+    }
+
     if (currentUser.role.code === 'JEFE_AREA' && role.code !== 'USUARIO') {
       throw new AppError({
         message: 'Solo se puedes crear usuarios normales',
@@ -72,6 +80,26 @@ export class UserService {
   }
 
   update = async ({ id, data }: { id: string; data: UpdateUserInput }) => {
+    if (data.roleId) {
+      const role = await this.userModel.findRoleById({ roleId: data.roleId })
+
+      if (!role) {
+        throw new AppError({
+          message: 'El rol no existe',
+          statusCode: 404,
+          code: 'ROLE_NOT_FOUND',
+        })
+      }
+
+      if (!role.isActive) {
+        throw new AppError({
+          message: 'No se puede asignar un rol inactivo',
+          statusCode: 400,
+          code: 'INACTIVE_ROLE',
+        })
+      }
+    }
+
     return this.userModel.update({
       id,
       data,

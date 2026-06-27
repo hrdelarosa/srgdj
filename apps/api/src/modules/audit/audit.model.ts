@@ -1,4 +1,4 @@
-import { and, count, desc, eq, gte, lte } from 'drizzle-orm'
+import { and, count, desc, eq, gte, lte, sql } from 'drizzle-orm'
 import { db } from '../../database/db.js'
 import { auditLogs, users } from '../../database/schema.js'
 import type { AuditQuery } from './audit.schema.js'
@@ -50,7 +50,7 @@ export class AuditModel {
         metadata: auditLogs.metadata,
         ip: auditLogs.ip,
         userAgent: auditLogs.userAgent,
-        createdAt: auditLogs.createdAt,
+        createdAt: sql<string>`date_format(${auditLogs.createdAt}, '%Y-%m-%dT%H:%i:%s')`,
         actor: {
           id: users.id,
           username: users.username,

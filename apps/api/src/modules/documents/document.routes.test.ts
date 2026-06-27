@@ -18,6 +18,7 @@ vi.mock('../../middlewares/require-auth.js', () => ({
         id: '019e9bc2-a9d6-74c9-adad-9cad76f1d9e2',
         code: 'ADMIN',
         name: 'Administrador',
+        isActive: true,
       },
       permissions: [
         'documents:create',

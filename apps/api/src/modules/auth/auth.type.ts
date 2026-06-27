@@ -15,6 +15,7 @@ export type AuthUser = {
     id: string
     code: string
     name: string
+    isActive: boolean
   }
   permissions: string[]
 }

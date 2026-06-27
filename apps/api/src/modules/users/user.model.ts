@@ -70,6 +70,7 @@ export class UserModel {
         id: roles.id,
         code: roles.code,
         name: roles.name,
+        isActive: roles.isActive,
       })
       .from(roles)
       .where(eq(roles.id, roleId))

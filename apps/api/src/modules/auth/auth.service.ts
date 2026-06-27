@@ -60,7 +60,7 @@ export class AuthService {
       username: data.username,
     })
 
-    if (!user || !user.isActive) {
+    if (!user) {
       await AuditService.create({
         data: {
           action: 'auth.login_failed',
@@ -99,6 +99,44 @@ export class AuthService {
         message: 'Credenciales inválidas',
         statusCode: 401,
         code: 'INVALID_CREDENTIALS',
+      })
+    }
+
+    if (!user.isActive) {
+      await AuditService.create({
+        data: {
+          actorUserId: user.id,
+          action: 'auth.login_failed',
+          entityType: 'auth',
+          metadata: { username: data.username, reason: 'inactive_user' },
+          ip: meta.ip ?? null,
+          userAgent: meta.userAgent ?? null,
+        },
+      })
+
+      throw new AppError({
+        message: 'Usuario inactivo',
+        statusCode: 403,
+        code: 'INACTIVE_USER',
+      })
+    }
+
+    if (!user.role.isActive) {
+      await AuditService.create({
+        data: {
+          actorUserId: user.id,
+          action: 'auth.login_failed',
+          entityType: 'auth',
+          metadata: { username: data.username, reason: 'inactive_role' },
+          ip: meta.ip ?? null,
+          userAgent: meta.userAgent ?? null,
+        },
+      })
+
+      throw new AppError({
+        message: 'El rol del usuario está inactivo',
+        statusCode: 403,
+        code: 'INACTIVE_ROLE',
       })
     }
 
@@ -191,6 +229,19 @@ export class AuthService {
         message: 'Usuario inactivo',
         statusCode: 401,
         code: 'INACTIVE_USER',
+      })
+    }
+
+    if (!session.user.role.isActive) {
+      await this.authModel.revokeSession({
+        sessionId: session.id,
+        reason: 'inactive_role',
+      })
+
+      throw new AppError({
+        message: 'El rol del usuario está inactivo',
+        statusCode: 401,
+        code: 'INACTIVE_ROLE',
       })
     }
 

@@ -23,6 +23,7 @@ export class AuthModel {
           id: roles.id,
           code: roles.code,
           name: roles.name,
+          isActive: roles.isActive,
         },
       })
       .from(users)
@@ -61,6 +62,7 @@ export class AuthModel {
           columns: {
             id: true,
             username: true,
+            isActive: true,
           },
           with: {
             role: {
@@ -68,6 +70,7 @@ export class AuthModel {
                 id: true,
                 code: true,
                 name: true,
+                isActive: true,
               },
             },
           },
@@ -102,6 +105,7 @@ export class AuthModel {
                 id: true,
                 code: true,
                 name: true,
+                isActive: true,
               },
             },
           },

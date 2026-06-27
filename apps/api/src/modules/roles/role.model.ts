@@ -1,7 +1,8 @@
-import { eq, inArray } from 'drizzle-orm'
+import { and, eq, inArray } from 'drizzle-orm'
 import { v7 as uuidv7 } from 'uuid'
 import { db } from '../../database/db.js'
 import { permissions, rolePermissions, roles } from '../../database/schema.js'
+import { AppError } from '../../utils/errors/app-error.js'
 import type {
   CreateRoleInput,
   UpdateRoleInput,
@@ -103,7 +104,20 @@ export class RoleModel {
       const validPermissions = await tx
         .select({ id: permissions.id })
         .from(permissions)
-        .where(inArray(permissions.id, data.permissionIds))
+        .where(
+          and(
+            inArray(permissions.id, data.permissionIds),
+            eq(permissions.isActive, true),
+          ),
+        )
+
+      if (validPermissions.length !== data.permissionIds.length) {
+        throw new AppError({
+          message: 'No se pueden asignar permisos inactivos o inexistentes',
+          statusCode: 400,
+          code: 'INVALID_ROLE_PERMISSIONS',
+        })
+      }
 
       await tx.insert(rolePermissions).values(
         validPermissions.map((permission) => ({

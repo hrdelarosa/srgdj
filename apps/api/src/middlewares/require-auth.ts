@@ -69,6 +69,32 @@ export const requireAuth: RequestHandler = async (req, res, next) => {
       })
     }
 
+    if (!session.user.isActive) {
+      await AuthModel.revokeSession({
+        sessionId: session.id,
+        reason: 'inactive_user',
+      })
+
+      throw new AppError({
+        message: 'Usuario inactivo',
+        statusCode: 401,
+        code: 'INACTIVE_USER',
+      })
+    }
+
+    if (!session.user.role.isActive) {
+      await AuthModel.revokeSession({
+        sessionId: session.id,
+        reason: 'inactive_role',
+      })
+
+      throw new AppError({
+        message: 'El rol del usuario está inactivo',
+        statusCode: 401,
+        code: 'INACTIVE_ROLE',
+      })
+    }
+
     await AuthModel.touchSession({ sessionId: session.id, date: now })
 
     const permissions = await AuthModel.findPermissionsByRoleId({

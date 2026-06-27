@@ -1,17 +1,10 @@
-import { Badge } from '@/shared/components/ui/badge'
+import { DataTable } from '@/modules/admin/components/DataTable'
+import { ButtonGroup } from '@/shared/components/ui/button-group'
+import StatusBadge from '@/modules/admin/components/StatusBadge'
 import EditRoleSheet from '@/modules/admin/components/roles/EditRoleSheet'
 import EditRoleDialog from '@/modules/admin/components/roles/EditRoleDialog'
 import CreateRoleDialog from '@/modules/admin/components/roles/CreateRoleDialog'
 import StatusToggleButton from '@/modules/admin/components/StatusToggleButton'
-import { ButtonGroup } from '@/shared/components/ui/button-group'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/shared/components/ui/table'
 import { useRoles } from '@/modules/admin/hooks/useRoles'
 
 export function AdminRolesPage() {
@@ -32,81 +25,59 @@ export function AdminRolesPage() {
         <CreateRoleDialog />
       </div>
 
-      <div className="overflow-hidden rounded-md border">
-        <Table>
-          <TableHeader className="bg-gray-100/75">
-            <TableRow>
-              <TableHead>Código</TableHead>
-              <TableHead>Nombre</TableHead>
-              <TableHead>Descripción</TableHead>
-              <TableHead className="w-20">Estado</TableHead>
-              <TableHead className="w-48.5">Acciones</TableHead>
-            </TableRow>
-          </TableHeader>
+      <DataTable
+        items={roles}
+        isLoading={rolesQuery.isLoading}
+        emptyMessage="No se encontraron roles"
+        getRowKey={(role) => role.id}
+        columns={[
+          {
+            key: 'code',
+            label: 'Código',
+            render: (role) => role.code,
+          },
+          {
+            key: 'name',
+            label: 'Nombre',
+            render: (role) => role.name,
+          },
+          {
+            key: 'description',
+            label: 'Descripción',
+            render: (role) => role.description,
+          },
+          {
+            key: 'isActive',
+            label: 'Estado',
+            render: (role) => <StatusBadge isActive={role.isActive} />,
+            className: 'w-20',
+          },
+        ]}
+        actions={{
+          className: 'w-48.5',
+          render: (role) => (
+            <ButtonGroup>
+              <ButtonGroup>
+                <StatusToggleButton
+                  isActive={role.isActive}
+                  onToggle={() =>
+                    changeRoleActive.mutate({
+                      id: role.id,
+                      active: !role.isActive,
+                    })
+                  }
+                  label="rol"
+                />
+              </ButtonGroup>
 
-          <TableBody>
-            {roles.length === 0 ? (
-              <TableRow>
-                <TableCell
-                  colSpan={5}
-                  className="text-muted-foreground text-center"
-                >
-                  No se encontraron roles
-                </TableCell>
-              </TableRow>
-            ) : rolesQuery.isLoading ? (
-              <TableRow>
-                <TableCell
-                  colSpan={5}
-                  className="text-muted-foreground text-center"
-                >
-                  Cargando...
-                </TableCell>
-              </TableRow>
-            ) : (
-              roles.map((role) => (
-                <TableRow key={role.id}>
-                  <TableCell>{role.code}</TableCell>
-                  <TableCell>{role.name}</TableCell>
-                  <TableCell>{role.description}</TableCell>
-                  <TableCell>
-                    <Badge
-                      className={
-                        role.isActive
-                          ? 'bg-emerald-100 text-emerald-700'
-                          : 'bg-zinc-100 text-zinc-600'
-                      }
-                    >
-                      {role.isActive ? 'Activo' : 'Inactivo'}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <ButtonGroup>
-                      <ButtonGroup>
-                        <StatusToggleButton
-                          isActive={role.isActive}
-                          onToggle={() =>
-                            changeRoleActive.mutate({
-                              id: role.id,
-                              active: !role.isActive,
-                            })
-                          }
-                          label="rol"
-                        />
-                      </ButtonGroup>
-
-                      <ButtonGroup>
-                        <EditRoleDialog id={role.id} />
-                        <EditRoleSheet id={role.id} />
-                      </ButtonGroup>
-                    </ButtonGroup>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
+              <ButtonGroup>
+                <EditRoleDialog id={role.id} />
+                <EditRoleSheet id={role.id} />
+              </ButtonGroup>
+            </ButtonGroup>
+          ),
+        }}
+      />
     </>
   )
 }

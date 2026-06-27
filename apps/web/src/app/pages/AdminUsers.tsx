@@ -1,15 +1,8 @@
-import { Badge } from '@/shared/components/ui/badge'
+import { DataTable } from '@/modules/admin/components/DataTable'
+import StatusBadge from '@/modules/admin/components/StatusBadge'
 import EditUserDialog from '@/modules/admin/components/users/EditUserDialog'
 import CreateUserDialog from '@/modules/admin/components/users/CreateUserDialog'
 import StatusToggleButton from '@/modules/admin/components/StatusToggleButton'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/shared/components/ui/table'
 import { useUsers } from '@/modules/admin/hooks/useUsers'
 
 export function AdminUsersPage() {
@@ -31,76 +24,54 @@ export function AdminUsersPage() {
         <CreateUserDialog />
       </div>
 
-      <div className="overflow-hidden rounded-md border">
-        <Table>
-          <TableHeader className="bg-gray-100">
-            <TableRow>
-              <TableHead>Usuario</TableHead>
-              <TableHead>Nombre</TableHead>
-              <TableHead>Rol</TableHead>
-              <TableHead>Estado</TableHead>
-              <TableHead className="w-8 text-right">Acciones</TableHead>
-            </TableRow>
-          </TableHeader>
+      <DataTable
+        items={users}
+        isLoading={usersQuery.isLoading}
+        emptyMessage="No se encontraron usuarios"
+        getRowKey={(user) => user.id}
+        columns={[
+          {
+            key: 'username',
+            label: 'Usuario',
+            render: (user) => user.username,
+          },
+          {
+            key: 'fullName',
+            label: 'Nombre',
+            render: (user) => user.fullName,
+          },
+          {
+            key: 'role',
+            label: 'Rol',
+            render: (user) => user.role.name,
+          },
+          {
+            key: 'isActive',
+            label: 'Estado',
+            render: (user) => <StatusBadge isActive={user.isActive} />,
+            className: 'w-20',
+          },
+        ]}
+        actions={{
+          className: 'w-29',
+          render: (user) => (
+            <div className="flex items-center justify-end gap-2">
+              <StatusToggleButton
+                isActive={user.isActive}
+                onToggle={() =>
+                  changeUserActive.mutate({
+                    id: user.id,
+                    active: !user.isActive,
+                  })
+                }
+                label="usuario"
+              />
 
-          <TableBody>
-            {users.length === 0 ? (
-              <TableRow>
-                <TableCell
-                  colSpan={5}
-                  className="text-muted-foreground text-center"
-                >
-                  No se encontraron usuarios
-                </TableCell>
-              </TableRow>
-            ) : usersQuery.isLoading ? (
-              <TableRow>
-                <TableCell
-                  colSpan={5}
-                  className="text-muted-foreground text-center"
-                >
-                  Cargando...
-                </TableCell>
-              </TableRow>
-            ) : (
-              users.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell>{user.username}</TableCell>
-                  <TableCell>{user.fullName}</TableCell>
-                  <TableCell>{user.role.name}</TableCell>
-                  <TableCell>
-                    <Badge
-                      className={
-                        user.isActive
-                          ? 'bg-emerald-100 text-emerald-700'
-                          : 'bg-zinc-100 text-zinc-600'
-                      }
-                    >
-                      {user.isActive ? 'Activo' : 'Inactivo'}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <StatusToggleButton
-                        isActive={user.isActive}
-                        onToggle={() =>
-                          changeUserActive.mutate({
-                            id: user.id,
-                            active: !user.isActive,
-                          })
-                        }
-                        label="usuario"
-                      />
-
-                      <EditUserDialog id={user.id} />
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
+              <EditUserDialog id={user.id} />
+            </div>
+          ),
+        }}
+      />
     </>
   )
 }

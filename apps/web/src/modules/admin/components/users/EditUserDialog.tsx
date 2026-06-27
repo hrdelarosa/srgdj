@@ -37,6 +37,7 @@ export default function EditUserDialog({ id }: { id: string }) {
   const [open, setOpen] = useState(false)
   const { user, updateUser } = useUsers(id)
   const { rolesQuery } = useRoles()
+  const activeRoles = rolesQuery.data?.items.filter((role) => role.isActive) ?? []
   const { register, handleSubmit, errors, reset, control } = useValidatedForm({
     formSchema: editUserFormSchema,
     defaultValues: {
@@ -132,7 +133,7 @@ export default function EditUserDialog({ id }: { id: string }) {
 
                     <SelectContent>
                       <SelectGroup>
-                        {rolesQuery.data?.items.map((role) => (
+                        {activeRoles.map((role) => (
                           <SelectItem key={role.id} value={role.id}>
                             {role.name}
                           </SelectItem>

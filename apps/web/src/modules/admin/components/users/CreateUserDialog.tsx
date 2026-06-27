@@ -38,6 +38,7 @@ export default function CreateUserDialog() {
   const [selectedRoleId, setSelectedRoleId] = useState('')
   const { createUser } = useUsers()
   const { rolesQuery } = useRoles()
+  const activeRoles = rolesQuery.data?.items.filter((role) => role.isActive) ?? []
   const { register, handleSubmit, errors, setValue, reset } = useValidatedForm({
     formSchema: createUserFormSchema,
     defaultValues: {
@@ -140,7 +141,7 @@ export default function CreateUserDialog() {
 
                 <SelectContent>
                   <SelectGroup>
-                    {rolesQuery.data?.items.map((role) => (
+                    {activeRoles.map((role) => (
                       <SelectItem key={role.id} value={role.id}>
                         {role.name}
                       </SelectItem>

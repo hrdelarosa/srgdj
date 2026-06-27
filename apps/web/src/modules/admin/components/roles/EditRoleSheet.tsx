@@ -27,7 +27,9 @@ export default function EditRoleSheet({ id }: { id: string }) {
   const [open, setOpen] = useState(false)
   const { rolePermissionsQuery } = useRoles(id)
   const { permissionsQuery, updateRolePermissions } = usePermissions()
-  const permissions = permissionsQuery.data?.items ?? []
+  const permissions =
+    permissionsQuery.data?.items.filter((permission) => permission.isActive) ??
+    []
   const rolePermissions = rolePermissionsQuery.data?.items ?? []
   const [selectedPermissions, setSelectedPermissions] = useState<Set<string>>(
     new Set(),

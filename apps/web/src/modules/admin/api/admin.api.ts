@@ -123,6 +123,8 @@ export const adminApi = {
 
   catalogs: (endpoint: string) =>
     apiClient<Items<CatalogItem>>(`/${endpoint}?includeInactive=true`),
+  catalog: (endpoint: string, id: string) =>
+    apiClient<CatalogItem>(`/${endpoint}/${id}`),
   createCatalog: (endpoint: string, data: Record<string, unknown>) =>
     apiClient<CatalogItem>(`/${endpoint}`, {
       method: 'POST',

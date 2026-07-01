@@ -23,7 +23,12 @@ export class DocumentCatalogService {
     return this.documentCatalogModel.findDocumentTypes()
   }
 
-  findAllDocumentTypes = async () => this.documentCatalogModel.findAllDocumentTypes()
+  findDocumentTypeById = async ({ id }: { id: string }) => {
+    return this.documentCatalogModel.findDocumentTypeById({ id })
+  }
+
+  findAllDocumentTypes = async () =>
+    this.documentCatalogModel.findAllDocumentTypes()
 
   createDocumentType = async ({ data }: { data: CreateDocumentTypeInput }) =>
     this.documentCatalogModel.createDocumentType({ data })
@@ -48,11 +53,18 @@ export class DocumentCatalogService {
     return this.documentCatalogModel.findDocumentStatuses()
   }
 
+  findDocumentStatusById = async ({ id }: { id: string }) => {
+    return this.documentCatalogModel.findDocumentStatusById({ id })
+  }
+
   findAllDocumentStatuses = async () =>
     this.documentCatalogModel.findAllDocumentStatuses()
 
-  createDocumentStatus = async ({ data }: { data: CreateDocumentStatusInput }) =>
-    this.documentCatalogModel.createDocumentStatus({ data })
+  createDocumentStatus = async ({
+    data,
+  }: {
+    data: CreateDocumentStatusInput
+  }) => this.documentCatalogModel.createDocumentStatus({ data })
 
   updateDocumentStatus = async ({
     id,
@@ -72,6 +84,9 @@ export class DocumentCatalogService {
 
   findPhysicalLocations = async () =>
     this.documentCatalogModel.findPhysicalLocations()
+
+  findPhysicalLocationById = async ({ id }: { id: string }) =>
+    this.documentCatalogModel.findPhysicalLocationById({ id })
 
   findAllPhysicalLocations = async () =>
     this.documentCatalogModel.findAllPhysicalLocations()

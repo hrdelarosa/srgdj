@@ -27,6 +27,12 @@ documentCatalogRoutes.get(
   requirePermission({ permission: 'catalogs:read' }),
   documentCatalogController.findDocumentTypes,
 )
+documentCatalogRoutes.get(
+  '/document-types/:id',
+  requirePermission({ permission: 'catalogs:read' }),
+  validateRequest({ params: catalogIdParamsSchema }),
+  documentCatalogController.findDocumentTypeById,
+)
 documentCatalogRoutes.post(
   '/document-types',
   requirePermission({ permission: 'catalogs:create' }),
@@ -60,6 +66,12 @@ documentCatalogRoutes.get(
   requirePermission({ permission: 'catalogs:read' }),
   documentCatalogController.findDocumentStatuses,
 )
+documentCatalogRoutes.get(
+  '/document-statuses/:id',
+  requirePermission({ permission: 'catalogs:read' }),
+  validateRequest({ params: catalogIdParamsSchema }),
+  documentCatalogController.findDocumentStatusById,
+)
 documentCatalogRoutes.post(
   '/document-statuses',
   requirePermission({ permission: 'catalogs:create' }),
@@ -92,6 +104,12 @@ documentCatalogRoutes.get(
   '/physical-locations',
   requirePermission({ permission: 'catalogs:read' }),
   documentCatalogController.findPhysicalLocations,
+)
+documentCatalogRoutes.get(
+  '/physical-locations/:id',
+  requirePermission({ permission: 'catalogs:read' }),
+  validateRequest({ params: catalogIdParamsSchema }),
+  documentCatalogController.findPhysicalLocationById,
 )
 documentCatalogRoutes.post(
   '/physical-locations',

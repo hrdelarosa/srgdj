@@ -2,6 +2,7 @@ import type { Request, Response } from 'express'
 import { DocumentCatalogModel } from './document-catalog.model.js'
 import { DocumentCatalogService } from './document-catalog.service.js'
 import { AuditService } from '../audit/audit.service.js'
+import { AppError } from '../../utils/errors/app-error.js'
 
 export class DocumentCatalogController {
   private readonly documentCatalogService: DocumentCatalogService
@@ -25,6 +26,22 @@ export class DocumentCatalogController {
     res.json({ items })
   }
 
+  findDocumentTypeById = async (req: Request, res: Response) => {
+    const item = await this.documentCatalogService.findDocumentTypeById({
+      id: req.params.id as string,
+    })
+
+    if (!item) {
+      throw new AppError({
+        message: 'Document type not found',
+        statusCode: 404,
+        code: 'DOCUMENT_TYPE_NOT_FOUND',
+      })
+    }
+
+    res.json(item)
+  }
+
   findDocumentStatuses = async (req: Request, res: Response) => {
     const includeInactive = req.query.includeInactive === 'true'
     const items = includeInactive
@@ -32,6 +49,22 @@ export class DocumentCatalogController {
       : await this.documentCatalogService.findDocumentStatuses()
 
     res.json({ items })
+  }
+
+  findDocumentStatusById = async (req: Request, res: Response) => {
+    const item = await this.documentCatalogService.findDocumentStatusById({
+      id: req.params.id as string,
+    })
+
+    if (!item) {
+      throw new AppError({
+        message: 'Document status not found',
+        statusCode: 404,
+        code: 'DOCUMENT_STATUS_NOT_FOUND',
+      })
+    }
+
+    res.json(item)
   }
 
   createDocumentType = async (req: Request, res: Response) => {
@@ -107,6 +140,22 @@ export class DocumentCatalogController {
       : await this.documentCatalogService.findPhysicalLocations()
 
     res.json({ items })
+  }
+
+  findPhysicalLocationById = async (req: Request, res: Response) => {
+    const item = await this.documentCatalogService.findPhysicalLocationById({
+      id: req.params.id as string,
+    })
+
+    if (!item) {
+      throw new AppError({
+        message: 'Physical location not found',
+        statusCode: 404,
+        code: 'PHYSICAL_LOCATION_NOT_FOUND',
+      })
+    }
+
+    res.json(item)
   }
 
   createPhysicalLocation = async (req: Request, res: Response) => {

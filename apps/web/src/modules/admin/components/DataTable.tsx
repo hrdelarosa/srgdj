@@ -24,7 +24,7 @@ interface Props<T> {
   }
 }
 
-export function DataTable<T>({
+export default function DataTable<T>({
   items,
   columns,
   isLoading = false,

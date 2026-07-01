@@ -1,4 +1,4 @@
-import { DataTable } from '@/modules/admin/components/DataTable'
+import DataTable from '@/modules/admin/components/DataTable'
 import { ButtonGroup } from '@/shared/components/ui/button-group'
 import StatusBadge from '@/modules/admin/components/StatusBadge'
 import EditRoleSheet from '@/modules/admin/components/roles/EditRoleSheet'

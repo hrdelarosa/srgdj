@@ -1,5 +1,5 @@
+import DataTable from '@/modules/admin/components/DataTable'
 import { formatDate } from '@/shared/lib/formatDate'
-import { DataTable } from '@/modules/admin/components/DataTable'
 import { useAudit } from '@/modules/admin/hooks/useAudit'
 
 export function AdminAuditPage() {

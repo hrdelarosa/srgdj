@@ -1,4 +1,4 @@
-import { DataTable } from '@/modules/admin/components/DataTable'
+import DataTable from '@/modules/admin/components/DataTable'
 import StatusBadge from '@/modules/admin/components/StatusBadge'
 import EditUserDialog from '@/modules/admin/components/users/EditUserDialog'
 import CreateUserDialog from '@/modules/admin/components/users/CreateUserDialog'

@@ -19,6 +19,11 @@ const optionalTextSchema = z
   .optional()
   .transform((value) => (value === '' ? undefined : value))
 
+const optionalQueryTextSchema = z.preprocess(
+  (value) => (value === '' ? undefined : value),
+  z.string().trim().optional(),
+)
+
 const localDateSchema = (message: string) =>
   z
     .string({ error: message })
@@ -81,15 +86,27 @@ export const documentIdParamsSchema = z.object({
 })
 
 export const findAllDocumentsQuerySchema = z.object({
+  q: optionalQueryTextSchema,
+
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(1).max(100).default(30),
-  query: z
-    .string()
-    .trim()
-    .optional()
-    .transform((value) => (value === '' ? undefined : value)),
-  statusId: optionalIdSchema,
-  documentTypeId: optionalIdSchema,
+
+  officeNumber: z.string().optional(),
+  caseNumber: z.string().optional(),
+  actor: z.string().optional(),
+  defendant: z.string().optional(),
+
+  documentTypeId: z.string().uuid().optional(),
+  currentStatusId: z.string().uuid().optional(),
+
+  receivedDateFrom: z.coerce.date().optional(),
+  receivedDateTo: z.coerce.date().optional(),
+
+  sortBy: z
+    .enum(['officeDate', 'receivedDate', 'documentType', 'status', 'createdAt'])
+    .default('createdAt'),
+
+  sortOrder: z.enum(['asc', 'desc']).default('desc'),
 })
 
 export type CreateDocumentFormTypes = z.infer<typeof createDocumentSchema>

@@ -1,6 +1,7 @@
 import { Redirect, Route, Switch } from 'wouter'
 import { PublicOnlyRoute } from './routes/PublicOnlyRoute'
 import { PrivateRoute } from './routes/PrivateRoute'
+import { PermissionRoute } from './routes/PermissionRoute'
 import { HomePage } from './pages/Home'
 import { LoginPage } from './pages/Login'
 import { NotFoundPage } from './pages/NotFoundPage'
@@ -58,33 +59,33 @@ export function AppRouter() {
       </Route>
 
       <Route path="/admin/users">
-        <PrivateRoute>
+        <PermissionRoute permission="users:read">
           <AdminUsersPage />
-        </PrivateRoute>
+        </PermissionRoute>
       </Route>
 
       <Route path="/admin/roles">
-        <PrivateRoute>
+        <PermissionRoute permission="roles:read">
           <AdminRolesPage />
-        </PrivateRoute>
+        </PermissionRoute>
       </Route>
 
       <Route path="/admin/permissions">
-        <PrivateRoute>
+        <PermissionRoute permission="permissions:read">
           <AdminPermissionsPage />
-        </PrivateRoute>
+        </PermissionRoute>
       </Route>
 
       <Route path="/admin/catalogs">
-        <PrivateRoute>
+        <PermissionRoute permission="catalogs:read">
           <AdminCatalogsPage />
-        </PrivateRoute>
+        </PermissionRoute>
       </Route>
 
       <Route path="/admin/audit">
-        <PrivateRoute>
+        <PermissionRoute permission="audit:read">
           <AdminAuditPage />
-        </PrivateRoute>
+        </PermissionRoute>
       </Route>
 
       <Route>

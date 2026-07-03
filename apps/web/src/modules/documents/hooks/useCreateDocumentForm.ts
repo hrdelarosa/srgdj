@@ -12,6 +12,14 @@ export function useCreateDocumentForm() {
   const statusesQuery = useDocumentStatuses()
   const [documentTypeId, setDocumentTypeId] = useState('')
   const [currentStatusId, setCurrentStatusId] = useState('')
+  const defaultTypeId = typesQuery.data?.items[0]?.id ?? ''
+  const defaultStatusId =
+    statusesQuery.data?.items.find((status) => status.code === 'RECIBIDO')
+      ?.id ??
+    statusesQuery.data?.items[0]?.id ??
+    ''
+  const selectedDocumentTypeId = documentTypeId || defaultTypeId
+  const selectedStatusId = currentStatusId || defaultStatusId
 
   const form = useValidatedForm({
     formSchema: createDocumentSchema,
@@ -33,30 +41,23 @@ export function useCreateDocumentForm() {
   const { setValue } = form
 
   useEffect(() => {
-    const defaultTypeId = typesQuery.data?.items[0]?.id
-    const defaultStatusId =
-      statusesQuery.data?.items.find((status) => status.code === 'RECIBIDO')
-        ?.id ?? statusesQuery.data?.items[0]?.id
-
     if (defaultTypeId && !documentTypeId) {
-      setDocumentTypeId(defaultTypeId)
       setValue('documentTypeId', defaultTypeId, {
         shouldValidate: true,
       })
     }
 
     if (defaultStatusId && !currentStatusId) {
-      setCurrentStatusId(defaultStatusId)
       setValue('currentStatusId', defaultStatusId, {
         shouldValidate: true,
       })
     }
   }, [
     currentStatusId,
+    defaultStatusId,
+    defaultTypeId,
     documentTypeId,
     setValue,
-    statusesQuery.data,
-    typesQuery.data,
   ])
 
   function handleDocumentTypeChange(value: string) {
@@ -79,8 +80,8 @@ export function useCreateDocumentForm() {
     createMutation,
     typesQuery,
     statusesQuery,
-    documentTypeId,
-    currentStatusId,
+    documentTypeId: selectedDocumentTypeId,
+    currentStatusId: selectedStatusId,
     handleDocumentTypeChange,
     handleStatusChange,
     ...form,

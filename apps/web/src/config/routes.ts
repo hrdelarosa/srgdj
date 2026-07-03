@@ -9,7 +9,7 @@ import {
 } from 'lucide-react'
 
 export const SIDEBAR_MAIN_ROUTES = [
-  { label: 'Home', href: '/Home', icon: HomeIcon },
+  { label: 'Home', href: '/home', icon: HomeIcon },
   { label: 'Documentos', href: '/documents', icon: FilesIcon },
   {
     label: 'Catálogos',

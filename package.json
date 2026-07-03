@@ -11,6 +11,9 @@
     "build:api": "pnpm --filter api build",
     "build:shared": "pnpm --filter @srgdj/shared build",
     "build": "pnpm build:shared && pnpm build:web && pnpm build:api",
+    "typecheck": "pnpm build:shared && pnpm --filter @srgdj/shared typecheck && pnpm --filter web typecheck && pnpm --filter api typecheck",
+    "lint": "pnpm --filter web lint",
+    "test": "pnpm test:api",
     "test:api": "pnpm --filter api test"
   },
   "devDependencies": {

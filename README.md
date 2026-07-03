@@ -2,103 +2,157 @@
 
 **Sistema de Registro y Gestión de Documentos Jurídicos**
 
-Plataforma web interna para el **Instituto Nacional de Migración (INM)** — Oficina de Representación Acapulco, Guerrero — área de **Asuntos Jurídicos**. Centraliza el registro, consulta y seguimiento de documentos legales (oficios, amparos, demandas, solicitudes de información, etc.) que hoy se gestionan principalmente en archivos físicos.
+SRGDJ es una plataforma web interna para el **Instituto Nacional de Migración (INM)**, Oficina de Representación Acapulco, Guerrero, área de **Asuntos Jurídicos**. Centraliza el registro, consulta y seguimiento de documentos legales que hoy dependen de archivos físicos y conocimiento individual.
 
-## Problema que resuelve
+## Funcionalidades Actuales
 
-- Búsqueda lenta e ineficiente de documentos ya archivados.
-- Falta de trazabilidad sobre el estado y el historial de cada documento.
-- Riesgo de duplicados y dependencia del conocimiento individual del personal.
-- Ausencia de un registro digital estructurado y consultable.
-
-## Funcionalidades
-
-| Área | Descripción |
+| Área | Estado actual |
 | --- | --- |
-| Registro de documentos | Captura estandarizada: número de oficio, expediente, actor, demandado, tipo, fechas, anexos, ubicación física, estado y observaciones. |
-| Consulta y búsqueda | Localización rápida por campos clave con filtros y paginación. |
-| Seguimiento | Bitácora de eventos por documento (cambios de estado, notas, actualizaciones). |
-| Control de acceso | Roles y permisos (administrador, jefe, usuario). |
-| Catálogos | Tipos de documento, estados y ubicaciones físicas. |
+| Autenticación | Login con JWT de acceso, refresh token en cookie httpOnly, rotación de sesión, logout y `/auth/me`. |
+| Seguridad | Hashing con Argon2, Helmet, CORS configurado, rate limit específico para `/auth/login`. |
+| Roles y permisos | RBAC por permisos como `documents:read`, `users:read`, `catalogs:update`, `audit:read`. |
+| Frontend protegido | Rutas privadas y rutas administrativas con guardas por permiso. |
+| Documentos | Alta, listado, búsqueda global, filtros, paginación, ordenamiento, detalle, edición y eventos. |
+| Eliminación | Soft delete para documentos. Hard delete queda protegido por `documents:remove`, no asignado en V1. |
+| Catálogos | Tipos de documento, estatus y ubicaciones físicas con activación/desactivación. |
+| Administración | Usuarios, roles, permisos, catálogos y auditoría. |
+| Validación compartida | Esquemas Zod en `@srgdj/shared` para contratos compartidos. |
 
-> El proyecto está en desarrollo activo. Módulos como autenticación JWT, exportaciones y panel administrativo forman parte del roadmap definido en la documentación técnica.
-
-## Stack tecnológico
+## Stack Tecnológico
 
 | Capa | Tecnología |
 | --- | --- |
-| Frontend | React 19, TypeScript, Vite |
-| Backend | Node.js, Express 5, TypeScript |
-| Base de datos | MySQL, Drizzle ORM |
-| Validación compartida | Zod (`@srgdj/shared`) |
 | Monorepo | pnpm workspaces |
+| Frontend | React 19, Vite, TypeScript |
+| UI | shadcn/ui, Tailwind CSS v4, lucide-react |
+| Estado cliente | Zustand para sesión, TanStack Query para server state |
+| Formularios | React Hook Form + Zod |
+| Backend | Express 5 + TypeScript |
+| Base de datos | MySQL + Drizzle ORM |
+| Testing | Vitest + Supertest |
 
-## Estructura del repositorio
+## Estructura del Repositorio
 
 ```text
 srgdj/
 ├── apps/
-│   ├── api/          # API REST (Express)
-│   └── web/          # Aplicación web (React + Vite)
+│   ├── api/
+│   │   ├── drizzle/              # Migraciones Drizzle
+│   │   └── src/
+│   │       ├── database/         # Cliente, schema y seed
+│   │       ├── middlewares/      # Auth, validación y errores
+│   │       ├── modules/          # auth, documents, catalogs, users, roles, permissions, audit
+│   │       ├── routes/
+│   │       └── utils/
+│   └── web/
+│       └── src/
+│           ├── app/              # Router, layouts y páginas
+│           ├── config/           # Configuración de navegación
+│           ├── modules/          # auth, documents, admin
+│           └── shared/           # apiClient, UI, hooks, utilidades
 ├── packages/
-│   ├── shared/       # Esquemas Zod, tipos y constantes compartidos
-│   └── tsconfig/     # Configuración TypeScript base
-├── docs/             # Documentación ejecutiva y técnica del proyecto
+│   ├── shared/                   # Zod schemas, tipos y constantes compartidas
+│   └── tsconfig/                 # Configuración TS base
+├── docs/
 ├── package.json
 └── pnpm-workspace.yaml
 ```
 
-## Requisitos previos
+## Requisitos
 
-- [Node.js](https://nodejs.org/) 20 o superior
-- [pnpm](https://pnpm.io/) 10.33.0 (gestor definido en el proyecto)
-- [MySQL](https://www.mysql.com/) 8 o superior
+- Node.js 20 o superior
+- pnpm 10.33.0 o compatible
+- MySQL 8 o superior
 
 ## Instalación
 
 ```bash
-# Clonar el repositorio
-git clone <url-del-repositorio>
-cd srgdj
-
-# Instalar dependencias
 pnpm install
-
-# Compilar el paquete compartido (requerido antes de ejecutar api o web)
 pnpm build:shared
 ```
 
-## Configuración
+## Variables de Entorno
 
-Crea un archivo `.env` en `apps/api/` con las variables necesarias:
+Archivo `apps/api/.env`:
 
 ```env
-# Conexión a MySQL
 DATABASE_URL=mysql://usuario:contraseña@localhost:3306/srgdj
-
-# Puerto del servidor API (opcional, por defecto 3000)
 PORT=3000
+WEB_ORIGIN=http://localhost:5173
+JWT_SECRET=secret-local
+JWT_EXPIRES_IN=15m
+REFRESH_TOKEN_DAYS=7
+SESSION_INACTIVITY_MINUTES=30
+LOGIN_RATE_LIMIT_MAX_ATTEMPTS=5
+LOGIN_RATE_LIMIT_WINDOW_MS=900000
 ```
 
-## Base de datos
+Archivo `apps/web/.env`:
 
-Desde el directorio `apps/api`:
+```env
+VITE_API_URL=http://localhost:3000/api/v1
+```
+
+## Scripts de Raíz
+
+| Script | Descripción |
+| --- | --- |
+| `pnpm dev:api` | Inicia la API con `tsx watch`. |
+| `pnpm dev:web` | Inicia Vite para frontend. |
+| `pnpm dev:shared` | Compila `@srgdj/shared` en watch. |
+| `pnpm build:shared` | Compila `packages/shared`. |
+| `pnpm build:web` | Compila frontend. |
+| `pnpm build:api` | Compila API. |
+| `pnpm build` | Compila shared, web y API. |
+| `pnpm typecheck` | Compila shared y ejecuta typecheck en shared, web y API. |
+| `pnpm lint` | Ejecuta ESLint del frontend. |
+| `pnpm test` | Ejecuta `test:api`. |
+| `pnpm test:api` | Ejecuta Vitest en `apps/api`. |
+
+## Scripts por Aplicación
+
+### API
+
+Desde la raíz:
 
 ```bash
-# Generar migraciones a partir del esquema
-pnpm db:generate
-
-# Aplicar migraciones
-pnpm db:migrate
-
-# (Opcional) Sincronizar esquema directamente en desarrollo
-pnpm db:push
-
-# Poblar datos de prueba (catálogos, usuarios y documentos ficticios)
-pnpm db:seed
+pnpm --filter api dev
+pnpm --filter api build
+pnpm --filter api typecheck
+pnpm --filter api test
+pnpm --filter api db:generate
+pnpm --filter api db:migrate
+pnpm --filter api db:push
+pnpm --filter api db:seed
+pnpm --filter api db:studio
 ```
 
-El seed crea usuarios de demostración. Credenciales iniciales:
+### Web
+
+```bash
+pnpm --filter web dev
+pnpm --filter web build
+pnpm --filter web typecheck
+pnpm --filter web lint
+pnpm --filter web preview
+```
+
+### Shared
+
+```bash
+pnpm --filter @srgdj/shared build
+pnpm --filter @srgdj/shared typecheck
+pnpm --filter @srgdj/shared dev
+```
+
+## Base de Datos
+
+```bash
+pnpm --filter api db:migrate
+pnpm --filter api db:seed
+```
+
+El seed crea catálogos, permisos, roles, usuarios demo, documentos y eventos.
 
 | Usuario | Contraseña | Rol |
 | --- | --- | --- |
@@ -106,73 +160,97 @@ El seed crea usuarios de demostración. Credenciales iniciales:
 | `jefa.juridico` | `Admin123*` | Jefe / Encargado |
 | `usuario.demo` | `Admin123*` | Usuario normal |
 
-> Usa estas credenciales solo en entornos de desarrollo.
+## Autenticación y Sesiones
 
-## Desarrollo
+- `POST /api/v1/auth/login` valida usuario y contraseña, crea sesión y devuelve `accessToken`.
+- El refresh token se guarda en cookie `httpOnly`, `sameSite=lax`, ruta `/api/v1/auth`.
+- `POST /api/v1/auth/refresh` rota access token y refresh token, actualiza hash de sesión y extiende expiración.
+- `POST /api/v1/auth/logout` revoca la sesión actual y limpia la cookie.
+- `GET /api/v1/auth/me` devuelve el usuario autenticado y permisos.
+- Las sesiones se invalidan si están revocadas, expiradas, inactivas o si el usuario/rol fue desactivado.
+- `/auth/login` tiene rate limit por cliente. Por defecto: 5 intentos cada 15 minutos.
 
-Ejecuta cada aplicación en una terminal distinta:
+## Roles y Permisos
 
-```bash
-# API (http://localhost:3000)
-pnpm dev:api
+Los permisos se evalúan en backend con `requirePermission`. El frontend también oculta navegación/acciones y protege rutas administrativas.
 
-# Frontend (http://localhost:5173)
-pnpm dev:web
+Permisos principales:
 
-# Recompilar @srgdj/shared en modo watch
-pnpm dev:shared
-```
+- Documentos: `documents:create`, `documents:read`, `documents:update`, `documents:delete`, `documents:events:create`.
+- Hard delete: `documents:remove`, protegido y no asignado en V1.
+- Catálogos: `catalogs:create`, `catalogs:read`, `catalogs:update`.
+- Usuarios: `users:create`, `users:read`, `users:update`, `users:deactivate`.
+- Roles: `roles:create`, `roles:read`, `roles:update`, `roles:permissions:update`.
+- Permisos: `permissions:create`, `permissions:read`, `permissions:update`.
+- Auditoría: `audit:read`.
 
-### Scripts disponibles (raíz)
-
-| Script | Descripción |
-| --- | --- |
-| `pnpm dev:api` | Inicia la API en modo desarrollo |
-| `pnpm dev:web` | Inicia el frontend con Vite |
-| `pnpm dev:shared` | Compila el paquete compartido en watch |
-| `pnpm build` | Compila shared, web y api |
-| `pnpm build:api` | Compila solo la API |
-| `pnpm build:web` | Compila solo el frontend |
-| `pnpm build:shared` | Compila solo el paquete compartido |
-
-### Scripts de base de datos (`apps/api`)
-
-| Script | Descripción |
-| --- | --- |
-| `pnpm db:generate` | Genera migraciones con Drizzle Kit |
-| `pnpm db:migrate` | Ejecuta migraciones pendientes |
-| `pnpm db:push` | Sincroniza el esquema sin migración |
-| `pnpm db:studio` | Abre Drizzle Studio |
-| `pnpm db:seed` | Inserta datos de prueba |
-
-## API
+## API Principal
 
 Base path: `/api/v1`
 
 | Método | Ruta | Descripción |
 | --- | --- | --- |
-| `GET` | `/health` | Estado del servicio |
-| `GET` | `/documents` | Listado de documentos |
-| `GET` | `/documents/:id` | Detalle de un documento |
-| `POST` | `/documents` | Alta de documento |
-| `PATCH` | `/documents/:id` | Actualización parcial |
-| `PATCH` | `/documents/delete/:id` | Eliminación lógica (soft delete) |
-| `DELETE` | `/documents/remove/:id` | Eliminación permanente |
+| `GET` | `/health` | Estado del servicio. |
+| `POST` | `/auth/login` | Login con rate limit. |
+| `POST` | `/auth/refresh` | Rotación de sesión. |
+| `GET` | `/auth/me` | Usuario actual. |
+| `POST` | `/auth/logout` | Revoca sesión. |
+| `GET` | `/documents` | Listado con `q`, filtros, paginación y ordenamiento. |
+| `GET` | `/documents/:id` | Detalle con eventos. |
+| `POST` | `/documents` | Alta de documento. |
+| `PATCH` | `/documents/:id` | Actualización parcial. No actualiza soft-deleted. |
+| `PATCH` | `/documents/delete/:id` | Soft delete. |
+| `DELETE` | `/documents/remove/:id` | Hard delete, requiere `documents:remove`; no habilitado para V1 normal. |
+| `GET` | `/documents/:id/events` | Eventos del documento. |
+| `POST` | `/documents/:id/events` | Crea nota/cambio de estado. |
+| `GET` | `/document-types` | Catálogo de tipos. |
+| `GET` | `/document-statuses` | Catálogo de estados. |
+| `GET` | `/physical-locations` | Catálogo de ubicaciones. |
+| `GET` | `/users`, `/roles`, `/permissions`, `/audit-logs` | Administración protegida. |
+
+## Módulo de Documentos
+
+- El listado excluye documentos con `deletedAt`.
+- La búsqueda usa `q` contra oficio, expediente, actor y demandado.
+- Filtros: `documentTypeId`, `currentStatusId`, `receivedDateFrom`, `receivedDateTo`.
+- Ordenamiento permitido: `officeDate`, `receivedDate`, `documentType`, `status`, `createdAt`; `sortOrder` acepta `asc` o `desc`.
+- Crear documento inserta un evento `CREATED`.
+- Actualizar documento inserta `UPDATED` o `STATUS_CHANGED`.
+- Soft delete marca `deletedAt` y registra evento `DELETED`.
+- Hard delete queda reservado para un permiso separado.
+
+## Frontend
+
+- `AuthBootstrap` restaura sesión usando refresh token.
+- `PrivateRoute` protege rutas autenticadas.
+- `PermissionRoute` protege rutas administrativas con permisos específicos.
+- `apiClient` agrega Bearer token, envía cookies, reintenta con refresh en 401 y limpia sesión si falla.
+- La navegación lateral oculta opciones si el usuario no tiene permiso.
+
+## Comandos de Validación
+
+```bash
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm build
+pnpm --filter api exec drizzle-kit check
+```
+
+## Limitaciones V1 y Riesgos Pendientes
+
+- `officeNumber` tiene índice único global. Un documento soft-deleted sigue reservando ese número; si se requiere reutilización tras soft delete, se necesita una estrategia MySQL-compatible.
+- El rate limit de login es en memoria. En despliegues multi-instancia debe migrarse a Redis u otro store compartido.
+- `documents:remove` existe como protección de hard delete, pero no se asigna en el seed ni se expone como flujo V1.
+- No hay pruebas frontend automatizadas para guardas de ruta o flujos visuales.
+- El build frontend aún muestra advertencia por chunk mayor a 500 kB.
+- Reportes/exportaciones, notificaciones y adjuntos digitales no forman parte de V1.
 
 ## Documentación
 
-Documentación adicional en la carpeta [`docs/`](./docs/):
-
-- [`00-Idea-General-SRGDJ.md`](./docs/00-Idea-General-SRGDJ.md) — Contexto y propuesta inicial
-- [`01-Documento-Ejecutivo.md`](./docs/01-Documento-Ejecutivo.md) — Alcance, beneficios e impacto institucional
-- [`02-Documento-Tecnico.md`](./docs/02-Documento-Tecnico.md) — Arquitectura, modelo de datos, API y roadmap
-
-## Convenciones de desarrollo
-
-- **Commits:** [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `docs:`, etc.)
-- **Base de datos:** `snake_case` en tablas y columnas
-- **API JSON:** `camelCase`
-- **TypeScript:** `camelCase` en variables y funciones; `PascalCase` en clases
+- [`docs/00-Idea-General-SRGDJ.md`](./docs/00-Idea-General-SRGDJ.md)
+- [`docs/01-Documento-Ejecutivo.md`](./docs/01-Documento-Ejecutivo.md)
+- [`docs/02-Documento-Tecnico.md`](./docs/02-Documento-Tecnico.md)
 
 ## Licencia
 

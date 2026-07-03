@@ -1,30 +1,11 @@
 import { z } from 'zod'
+import {
+  findAllDocumentsQuerySchema,
+  type FindAllDocumentsQuery,
+} from '@srgdj/shared'
 
-export const documentQuerySchema = z.object({
-  q: z.string().optional(),
-
-  page: z.coerce.number().int().positive().default(1),
-  pageSize: z.coerce.number().int().positive().max(100).default(30),
-
-  officeNumber: z.string().optional(),
-  caseNumber: z.string().optional(),
-  actor: z.string().optional(),
-  defendant: z.string().optional(),
-
-  documentTypeId: z.string().uuid().optional(),
-  currentStatusId: z.string().uuid().optional(),
-
-  receivedDateFrom: z.coerce.date().optional(),
-  receivedDateTo: z.coerce.date().optional(),
-
-  sortBy: z
-    .enum(['officeDate', 'receivedDate', 'documentType', 'status', 'createdAt'])
-    .default('createdAt'),
-
-  sortOrder: z.enum(['asc', 'desc']).default('desc'),
-})
-
-export type DocumentQuery = z.infer<typeof documentQuerySchema>
+export const documentQuerySchema = findAllDocumentsQuerySchema
+export type DocumentQuery = FindAllDocumentsQuery
 
 export const createDocumentEventSchema = z.object({
   eventType: z.enum([

@@ -5,6 +5,7 @@ import { validateRequest } from '../../middlewares/validate-request.js'
 import { loginSchema } from './auth.schema.js'
 import { requireAuth } from '../../middlewares/require-auth.js'
 import { z } from 'zod'
+import { loginRateLimit } from './login-rate-limit.js'
 
 export const authRoutes = Router()
 const authController = new AuthController({
@@ -13,6 +14,7 @@ const authController = new AuthController({
 
 authRoutes.post(
   '/login',
+  loginRateLimit,
   validateRequest({ body: loginSchema }),
   authController.login,
 )

@@ -102,9 +102,9 @@ export class DocumentController {
 
     if (!document) {
       throw new AppError({
-        message: 'Failed to update document',
-        statusCode: 500,
-        code: 'DOCUMENT_UPDATE_FAILED',
+        message: 'Document not found',
+        statusCode: 404,
+        code: 'DOCUMENT_NOT_FOUND',
       })
     }
 
@@ -160,7 +160,16 @@ export class DocumentController {
     // un documento de forma permanente
 
     const id = req.params.id as string
-    await this.documentService.remove({ id })
+    const removed = await this.documentService.remove({ id })
+
+    if (!removed) {
+      throw new AppError({
+        message: 'Document not found',
+        statusCode: 404,
+        code: 'DOCUMENT_NOT_FOUND',
+      })
+    }
+
     res.status(204).send()
   }
 

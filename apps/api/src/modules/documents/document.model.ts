@@ -143,7 +143,7 @@ export class DocumentModel {
         eq(documents.physicalLocationId, physicalLocations.id),
       )
       .where(where)
-      .orderBy(desc(documents.receivedDate))
+      .orderBy(orderBy)
       .limit(limit)
       .offset(offset)
 
@@ -325,7 +325,7 @@ export class DocumentModel {
     const [currentDocument] = await db
       .select()
       .from(documents)
-      .where(eq(documents.id, id))
+      .where(and(eq(documents.id, id), isNull(documents.deletedAt)))
       .limit(1)
 
     if (!currentDocument) return null
@@ -364,7 +364,10 @@ export class DocumentModel {
       document.currentStatusId !== currentDocument.currentStatusId
 
     await db.transaction(async (tx) => {
-      await tx.update(documents).set(updatedFields).where(eq(documents.id, id))
+      await tx
+        .update(documents)
+        .set(updatedFields)
+        .where(and(eq(documents.id, id), isNull(documents.deletedAt)))
 
       if (statusChanged) {
         await tx.insert(documentEvents).values({
@@ -504,7 +507,7 @@ export class DocumentModel {
             updatedAt: new Date(),
             updatedBy: userId,
           })
-          .where(eq(documents.id, id))
+          .where(and(eq(documents.id, id), isNull(documents.deletedAt)))
       }
 
       const eventId = uuidv7()

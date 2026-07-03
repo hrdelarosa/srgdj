@@ -6,6 +6,8 @@ describe('findAllDocumentsQuerySchema', () => {
     expect(findAllDocumentsQuerySchema.parse({})).toEqual({
       page: 1,
       pageSize: 30,
+      sortBy: 'createdAt',
+      sortOrder: 'desc',
     })
   })
 
@@ -15,32 +17,40 @@ describe('findAllDocumentsQuerySchema', () => {
     ).toEqual({
       page: 2,
       pageSize: 15,
+      sortBy: 'createdAt',
+      sortOrder: 'desc',
     })
   })
 
-  it('normaliza query vacío a undefined', () => {
-    expect(findAllDocumentsQuerySchema.parse({ query: '' })).toEqual({
+  it('normaliza q vacío a undefined', () => {
+    expect(findAllDocumentsQuerySchema.parse({ q: '' })).toEqual({
       page: 1,
       pageSize: 30,
+      sortBy: 'createdAt',
+      sortOrder: 'desc',
     })
   })
 
   it('acepta filtros opcionales', () => {
-    const statusId = '019e9bc2-a9d0-72f2-a385-2c5d1dd3310f'
+    const currentStatusId = '019e9bc2-a9d0-72f2-a385-2c5d1dd3310f'
     const documentTypeId = '019e9bc2-a9cd-74e0-bcc6-89bd3dd7c001'
 
     expect(
       findAllDocumentsQuerySchema.parse({
-        query: 'González',
-        statusId,
+        q: 'González',
+        currentStatusId,
         documentTypeId,
+        sortBy: 'officeDate',
+        sortOrder: 'asc',
       }),
     ).toEqual({
       page: 1,
       pageSize: 30,
-      query: 'González',
-      statusId,
+      q: 'González',
+      currentStatusId,
       documentTypeId,
+      sortBy: 'officeDate',
+      sortOrder: 'asc',
     })
   })
 })

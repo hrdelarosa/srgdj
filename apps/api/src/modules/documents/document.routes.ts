@@ -55,7 +55,7 @@ documentRoutes.patch(
 )
 documentRoutes.delete(
   '/remove/:id',
-  requirePermission({ permission: 'documents:delete' }),
+  requirePermission({ permission: 'documents:remove' }),
   validateRequest({ params: documentIdParamsSchema }),
   documentController.remove,
 )

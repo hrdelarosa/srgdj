@@ -120,6 +120,7 @@ pnpm --filter api dev
 pnpm --filter api build
 pnpm --filter api typecheck
 pnpm --filter api test
+pnpm --filter api run test:integration
 pnpm --filter api db:generate
 pnpm --filter api db:migrate
 pnpm --filter api db:push
@@ -237,6 +238,34 @@ pnpm build
 pnpm --filter api exec drizzle-kit check
 ```
 
+### Pruebas de integración MySQL
+
+Las pruebas de integración de API usan una base MySQL desechable y no se ejecutan contra `DATABASE_URL`. Para habilitarlas se debe definir `INTEGRATION_DATABASE_URL` con un usuario exclusivo de pruebas.
+
+El usuario debe poder:
+
+- Conectarse al servidor MySQL.
+- Crear y eliminar bases de datos temporales con prefijo `srgdj_it_`.
+- Crear, alterar, indexar, insertar, actualizar, borrar y consultar tablas dentro de esas bases.
+- Crear llaves foráneas e índices usados por las migraciones Drizzle.
+
+Ejemplo local:
+
+```sql
+CREATE USER 'srgdj_integration'@'localhost' IDENTIFIED BY 'password-local';
+GRANT CREATE, DROP ON *.* TO 'srgdj_integration'@'localhost';
+GRANT ALL PRIVILEGES ON `srgdj\_it\_%`.* TO 'srgdj_integration'@'localhost';
+FLUSH PRIVILEGES;
+```
+
+Ejecución:
+
+```bash
+INTEGRATION_DATABASE_URL=mysql://srgdj_integration:password-local@localhost:3306/mysql pnpm --filter api run test:integration
+```
+
+Si `INTEGRATION_DATABASE_URL` no está definida, el comando se carga correctamente pero omite la suite de integración.
+
 ## Limitaciones V1 y Riesgos Pendientes
 
 - `officeNumber` tiene índice único global. Un documento soft-deleted sigue reservando ese número; si se requiere reutilización tras soft delete, se necesita una estrategia MySQL-compatible.
@@ -251,6 +280,7 @@ pnpm --filter api exec drizzle-kit check
 - [`docs/00-Idea-General-SRGDJ.md`](./docs/00-Idea-General-SRGDJ.md)
 - [`docs/01-Documento-Ejecutivo.md`](./docs/01-Documento-Ejecutivo.md)
 - [`docs/02-Documento-Tecnico.md`](./docs/02-Documento-Tecnico.md)
+- [`docs/03-Preparacion-Produccion.md`](./docs/03-Preparacion-Produccion.md)
 
 ## Licencia
 

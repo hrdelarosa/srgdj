@@ -114,6 +114,7 @@ srgdj/
 | `pnpm --filter api typecheck` | `tsc --noEmit` |
 | `pnpm --filter api start` | `node dist/server.js` |
 | `pnpm --filter api test` | `vitest run` |
+| `pnpm --filter api run test:integration` | Ejecuta pruebas de integración con MySQL desechable. |
 | `pnpm --filter api db:generate` | Genera migraciones Drizzle. |
 | `pnpm --filter api db:migrate` | Ejecuta migraciones. |
 | `pnpm --filter api db:push` | Sincroniza schema en desarrollo. |
@@ -460,6 +461,34 @@ Validación de Drizzle:
 pnpm --filter api exec drizzle-kit check
 ```
 
+### Pruebas de integración MySQL
+
+La API incluye una suite de integración separada en `apps/api/src/integration`. Esta suite usa `INTEGRATION_DATABASE_URL`, crea una base temporal `srgdj_it_<suffix>`, aplica las migraciones SQL de `apps/api/drizzle`, ejecuta los flujos reales y elimina la base al terminar.
+
+No debe apuntar a `DATABASE_URL` de desarrollo ni producción. Debe usarse un usuario exclusivo de pruebas con permisos para:
+
+1. Conectarse al servidor MySQL.
+2. Crear y eliminar bases temporales con prefijo `srgdj_it_`.
+3. Crear, alterar, indexar y referenciar tablas dentro de esas bases.
+4. Insertar, consultar, actualizar y borrar datos durante la prueba.
+
+Ejemplo local:
+
+```sql
+CREATE USER 'srgdj_integration'@'localhost' IDENTIFIED BY 'password-local';
+GRANT CREATE, DROP ON *.* TO 'srgdj_integration'@'localhost';
+GRANT ALL PRIVILEGES ON `srgdj\_it\_%`.* TO 'srgdj_integration'@'localhost';
+FLUSH PRIVILEGES;
+```
+
+Ejecución:
+
+```bash
+INTEGRATION_DATABASE_URL=mysql://srgdj_integration:password-local@localhost:3306/mysql pnpm --filter api run test:integration
+```
+
+Si la variable no está definida, la suite se omite para mantener rápidas y determinísticas las pruebas unitarias.
+
 Cobertura actual:
 
 - Tests de schema de documentos.
@@ -496,6 +525,8 @@ pnpm --filter api start
 ```
 
 El frontend debe servirse como build estático detrás de un servidor web o proxy institucional.
+
+La guía operativa de despliegue, variables de entorno, requisitos MySQL, respaldos, restauración, migraciones, rollback, health checks y checklist de piloto vive en [`03-Preparacion-Produccion.md`](./03-Preparacion-Produccion.md).
 
 ---
 

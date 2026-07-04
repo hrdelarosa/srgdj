@@ -4,6 +4,8 @@ import {
   UpdateDocumentModelInput,
 } from '@srgdj/shared'
 import { CreateDocumentEventInput, DocumentQuery } from './document.schema.js'
+import { AppError } from '../../utils/errors/app-error.js'
+import { isMysqlForeignKeyError } from '../../utils/errors/mysql-errors.js'
 
 export class DocumentService {
   private readonly documentModel: typeof DocumentModel
@@ -25,7 +27,11 @@ export class DocumentService {
   }
 
   create = async ({ document }: { document: CreateDocumentModelInput }) => {
-    return this.documentModel.create({ document })
+    try {
+      return await this.documentModel.create({ document })
+    } catch (error) {
+      this.throwInvalidDocumentReference(error)
+    }
   }
 
   update = async ({
@@ -35,7 +41,11 @@ export class DocumentService {
     id: string
     document: UpdateDocumentModelInput
   }) => {
-    return this.documentModel.update({ id, document })
+    try {
+      return await this.documentModel.update({ id, document })
+    } catch (error) {
+      this.throwInvalidDocumentReference(error)
+    }
   }
 
   delete = async ({ id, userId }: { id: string; userId: string }) => {
@@ -59,6 +69,23 @@ export class DocumentService {
     data: CreateDocumentEventInput
     userId: string
   }) => {
-    return this.documentModel.createEvent({ id, data, userId })
+    try {
+      return await this.documentModel.createEvent({ id, data, userId })
+    } catch (error) {
+      this.throwInvalidDocumentReference(error)
+    }
+  }
+
+  private throwInvalidDocumentReference(error: unknown): never {
+    if (isMysqlForeignKeyError(error)) {
+      throw new AppError({
+        message:
+          'El documento referencia un tipo, estatus, ubicación o usuario inexistente',
+        statusCode: 400,
+        code: 'INVALID_DOCUMENT_REFERENCE',
+      })
+    }
+
+    throw error
   }
 }
